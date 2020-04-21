@@ -1,6 +1,6 @@
 # PSK-never-again
 
-DevBridge project using ASP .NET Core
+DevBridge project using ASP .NET Core  
 .NET Core 3.1
 
 ## Starting project
@@ -13,8 +13,8 @@ DevBridge project using ASP .NET Core
 To create a local DB:
 1. Open Package Manager console
 2. Select Default project: "Infrastructure"
-3. Create a migration if there isn't one:
-	1.Run command `add-migration "Migration name"`
+3. Create a migration if there isn't one:  
+	1. Run command `add-migration "Migration name"`
 4. Run command `update-database`
 
 
