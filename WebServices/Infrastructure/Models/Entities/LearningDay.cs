@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Infrastructure.Models.Entities
 {
     public class LearningDay
     {
-        public int LearningDay_Id { get; set; }
+        public int Id { get; set; }
         public List<Topic> Topics { get; set; }
-        public string Commnents { get; set; }
+        public string Comment { get; set; }
     }
 }

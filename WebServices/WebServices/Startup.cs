@@ -1,3 +1,4 @@
+using Infrastructure.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebServices
 {
@@ -26,6 +28,8 @@ namespace WebServices
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            services.AddDbContext<EducationSystemDbContext>(options => 
+                    options.UseSqlServer(Configuration.GetConnectionString("EducationSystemDbContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

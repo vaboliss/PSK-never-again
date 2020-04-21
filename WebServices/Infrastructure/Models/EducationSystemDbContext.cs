@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Infrastructure.Models.Entities;
+﻿using Infrastructure.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Models
 {
     public class EducationSystemDbContext : DbContext
     {
-        public EducationSystemDbContext() : base()
-        {
-
-        }
+        public EducationSystemDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<Topic> Topics { get; set; }
         public DbSet<LearningDay> LearningDays { get; set; }
