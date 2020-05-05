@@ -13,6 +13,5 @@ namespace Infrastructure.Models
         public DbSet<Team> Teams { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<Worker> Workers { get; set; }
-
     }
 }
