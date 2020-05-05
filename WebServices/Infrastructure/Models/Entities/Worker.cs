@@ -9,6 +9,6 @@ namespace Infrastructure.Models.Entities
         public string LastName { get; set; }
         public Restriction Restriction { get; set; }
         public List<Worker> Subordinates { get; set; }
-        public List<Topic> LearntTopics { get; set; }
+        public IList<Worker_Topic> Worker_Topics { get; set; } 
     }
 }

@@ -8,5 +8,6 @@ namespace Infrastructure.Models.Entities
         public string Name { get; set; }
         public string Description { get; set; }
         public List<Topic> SubTopics { get; set; }
+        public IList<Worker_Topic> Worker_Topics { get; set; }
     }
 }

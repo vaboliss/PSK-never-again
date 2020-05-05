@@ -12,6 +12,12 @@ namespace Infrastructure.Models
         public DbSet<Restriction> Restrictions { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Goal> Goals { get; set; }
-        public DbSet<Worker> Workers { get; set; }
+        public DbSet<Worker> Workers { get; set; } 
+        public DbSet<Worker_Topic> Worker_Topics { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Worker_Topic>().HasKey(wt => new { wt.WorkerId, wt.TopicId});
+        }
     }
 }

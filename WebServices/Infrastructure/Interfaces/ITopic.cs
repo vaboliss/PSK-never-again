@@ -5,9 +5,8 @@ using Infrastructure.Models.Entities;
 
 namespace Infrastructure.Interfaces
 {
-    public interface IWorker
+    public interface ITopic
     {
-        List<Worker> GetWorkersByTopic(int topicId);
+        Topic GetTopicById(int id);
     }
-
 }

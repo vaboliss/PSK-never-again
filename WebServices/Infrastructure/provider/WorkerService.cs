@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web.Http;
 using Infrastructure.Interfaces;
 using Infrastructure.Models;
 using Infrastructure.Models.Entities;
@@ -16,13 +17,18 @@ namespace Infrastructure.provider
         {
             _edu = edu;
         }
-        public List<Worker> GetWorkersByTopic(Topic topic)
+        public List<Worker> GetWorkersByTopic(int topicId)
         {
-            var databaseResults = _edu.Workers.Where(w => w.LearntTopics.Contains(topic));
+            var databaseResults = _edu.Worker_Topics.Where(x => x.TopicId == topicId);
 
             if (databaseResults.Any())
             {
-                return databaseResults.ToList();
+                var workers = databaseResults.Select(w=> w.Worker);
+                if (workers.Any())
+                {
+                    return workers.ToList();
+                }
+                return null;
             }
 
             return null;

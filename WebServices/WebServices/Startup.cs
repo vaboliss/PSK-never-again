@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Infrastructure.Interfaces;
+using Infrastructure.provider;
 
 namespace WebServices
 {
@@ -30,6 +32,9 @@ namespace WebServices
             });
             services.AddDbContext<EducationSystemDbContext>(options => 
                     options.UseSqlServer(Configuration.GetConnectionString("EducationSystemDbContext")));
+
+            services.AddTransient<IWorker, WorkerService>();
+            services.AddTransient<ITopic, TopicService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

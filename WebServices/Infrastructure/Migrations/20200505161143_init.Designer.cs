@@ -4,14 +4,16 @@ using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(EducationSystemDbContext))]
-    partial class EducationSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200505161143_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,16 +115,11 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("TopicId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WorkerId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("LearningDayId");
 
                     b.HasIndex("TopicId");
-
-                    b.HasIndex("WorkerId");
 
                     b.ToTable("Topics");
                 });
@@ -155,6 +152,21 @@ namespace Infrastructure.Migrations
                     b.ToTable("Workers");
                 });
 
+            modelBuilder.Entity("Infrastructure.Models.Entities.Worker_Topic", b =>
+                {
+                    b.Property<int>("WorkerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int");
+
+                    b.HasKey("WorkerId", "TopicId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("Worker_Topics");
+                });
+
             modelBuilder.Entity("Infrastructure.Models.Entities.Goal", b =>
                 {
                     b.HasOne("Infrastructure.Models.Entities.Topic", "Topic")
@@ -182,10 +194,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Infrastructure.Models.Entities.Topic", null)
                         .WithMany("SubTopics")
                         .HasForeignKey("TopicId");
-
-                    b.HasOne("Infrastructure.Models.Entities.Worker", null)
-                        .WithMany("LearntTopics")
-                        .HasForeignKey("WorkerId");
                 });
 
             modelBuilder.Entity("Infrastructure.Models.Entities.Worker", b =>
@@ -197,6 +205,21 @@ namespace Infrastructure.Migrations
                     b.HasOne("Infrastructure.Models.Entities.Worker", null)
                         .WithMany("Subordinates")
                         .HasForeignKey("WorkerId");
+                });
+
+            modelBuilder.Entity("Infrastructure.Models.Entities.Worker_Topic", b =>
+                {
+                    b.HasOne("Infrastructure.Models.Entities.Topic", "Topic")
+                        .WithMany("Worker_Topics")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Infrastructure.Models.Entities.Worker", "Worker")
+                        .WithMany("Worker_Topics")
+                        .HasForeignKey("WorkerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
