@@ -6,7 +6,7 @@ using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebServices.Controllers
+namespace EducationSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

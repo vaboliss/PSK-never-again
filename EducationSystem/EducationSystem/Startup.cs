@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Infrastructure.Interfaces;
 using Infrastructure.provider;
 
-namespace WebServices
+namespace EducationSystem
 {
     public class Startup
     {

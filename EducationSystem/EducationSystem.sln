@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServices", "WebServices\WebServices.csproj", "{D73381FE-29B6-4127-B087-54BA900C2D3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EducationSystem", "EducationSystem\EducationSystem.csproj", "{D73381FE-29B6-4127-B087-54BA900C2D3C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{926711BD-D34E-4D54-8E67-FF1D7BBAE1FA}"
 EndProject
