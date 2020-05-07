@@ -1,7 +1,0 @@
-C:\PSK-never-again\WebServices\Core\bin\Debug\netcoreapp3.1\Core.deps.json
-C:\PSK-never-again\WebServices\Core\bin\Debug\netcoreapp3.1\Core.dll
-C:\PSK-never-again\WebServices\Core\bin\Debug\netcoreapp3.1\Core.pdb
-C:\PSK-never-again\WebServices\Core\obj\Debug\netcoreapp3.1\Core.AssemblyInfoInputs.cache
-C:\PSK-never-again\WebServices\Core\obj\Debug\netcoreapp3.1\Core.AssemblyInfo.cs
-C:\PSK-never-again\WebServices\Core\obj\Debug\netcoreapp3.1\Core.dll
-C:\PSK-never-again\WebServices\Core\obj\Debug\netcoreapp3.1\Core.pdb
