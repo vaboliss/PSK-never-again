@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EducationSystem.Data;
+using EducationSystem.Interfaces;
+using EducationSystem.Provider;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,6 +30,7 @@ namespace EducationSystem
             services.AddControllersWithViews();
             services.AddDbContext<EducationSystemDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("EducationSystemDbContext")));
+            services.AddScoped<ITopic, TopicService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
