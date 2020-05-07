@@ -14,21 +14,5 @@ namespace Infrastructure.Provider
         {
             _edu = edu;
         }
-        public List<Worker> GetWorkersByTopic(int topicId)
-        {
-            var databaseResults = _edu.WorkerTopics.Where(x => x.TopicId == topicId);
-
-            if (databaseResults.Any())
-            {
-                var workers = databaseResults.Select(w=> w.Worker);
-                if (workers.Any())
-                {
-                    return workers.ToList();
-                }
-                return null;
-            }
-
-            return null;
-        }
     }
 }
