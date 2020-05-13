@@ -37,8 +37,9 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var topic = await _context.Topics
+            var topic = await _context.Topics.Include(m=>m.SubTopics)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            Console.WriteLine(topic.SubTopics.Count);
             if (topic == null)
             {
                 return NotFound();

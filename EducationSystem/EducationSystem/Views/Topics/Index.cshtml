@@ -24,9 +24,15 @@
     <tbody>
         @foreach (var item in Model)
         {
+            if (item.Parent == null)
+            {
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
+
+                    @foreach(var item2 in item.SubTopics){
+                        @item2.Name;
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)
@@ -40,6 +46,7 @@
             </tr>
             <tr>
             </tr>
+            }
         }
     </tbody>
 </table>
