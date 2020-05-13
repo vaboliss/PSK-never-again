@@ -18,6 +18,7 @@ namespace EducationSystem.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<WorkerTopic>().HasKey(wt => new { wt.WorkerId, wt.TopicId});
+            modelBuilder.Entity<Topic>().HasMany(t => t.SubTopics).WithOne(t => t.Parent);
         }
     }
 }

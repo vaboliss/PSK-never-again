@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "7u8YpJ/TBBjWn5/Ro/QXiwiB6SSP/6syXVZPpAUSWg7A4pp8E4EzUqXlqeRlk8+rDX1mtRZ5Pq6C/aScaLVvEQ==",
+  "dgSpecHash": "vw1e8iuVnbNnfVabKQjT/wzBxOO2HitoVvXVJezn+31LO7jfITarnx/HXeUcO+gjmbkv9z07lzrkf5m2Uk3dyg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\kajus\\Projects\\PSK-never-again\\EducationSystem\\Core\\Core.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "D:\\psk\\EducationSystem\\Core\\Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\juliu\\.nuget\\packages\\microsoft.netcore.app.ref\\3.1.0\\microsoft.netcore.app.ref.3.1.0.nupkg.sha512",
+    "C:\\Users\\juliu\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\3.1.0\\microsoft.windowsdesktop.app.ref.3.1.0.nupkg.sha512"
+  ],
   "logs": []
 }

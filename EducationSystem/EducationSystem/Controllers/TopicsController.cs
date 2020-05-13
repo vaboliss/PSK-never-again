@@ -50,6 +50,7 @@ namespace EducationSystem.Controllers
         // GET: Topics/Create
         public IActionResult Create()
         {
+            ViewBag.TopicList = new SelectList(_context.Topics.ToListAsync().Result, "Id", "Name");
             return View();
         }
 
@@ -58,8 +59,10 @@ namespace EducationSystem.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Topic topic)
+        public async Task<IActionResult> Create( Topic topic)
         {
+            topic.Parent = _topicService.GetTopicById(topic.Parent.Id);
+           // Console.WriteLine(topic.Parent.Id);
             if (ModelState.IsValid)
             {
                 _context.Add(topic);
