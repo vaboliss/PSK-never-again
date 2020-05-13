@@ -39,19 +39,6 @@
                 </td>
             </tr>
             <tr>
-                @if (@item.SubTopics != null)
-                {
-                    @foreach (var item2 in @item.SubTopics)
-                    {
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item2.Id">Edit</a> |
-                            <a asp-action="Details" asp-route-id="@item2.Id">Details</a> |
-                            <a asp-action="Delete" asp-route-id="@item2.Id">Delete</a>
-                            <a asp-action="Workers" asp-route-id="@item2.Id">Workers</a>
-                        </td>
-                        Console.WriteLine(@item2.Parent.Name);
-
-                    }}
             </tr>
         }
     </tbody>

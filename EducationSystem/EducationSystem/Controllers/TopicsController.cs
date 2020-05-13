@@ -50,7 +50,12 @@ namespace EducationSystem.Controllers
         // GET: Topics/Create
         public IActionResult Create()
         {
-            ViewBag.TopicList = new SelectList(_context.Topics.ToListAsync().Result, "Id", "Name");
+            List<Topic> topiclist = _context.Topics.ToListAsync().Result;
+            topiclist.Insert(0,new Topic() { Id = -1, Name = "none" });
+            
+            SelectList sl2 = new SelectList(topiclist, "Id", "Name"); ;
+            ViewBag.TopicList = sl2;
+            
             return View();
         }
 
