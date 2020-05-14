@@ -7,29 +7,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EducationSystem.Data;
 using EducationSystem.Models;
-using EducationSystem.Interfaces;
 
 namespace EducationSystem.Controllers
 {
-    public class TopicsController : Controller
+    public class TeamsController : Controller
     {
         private readonly EducationSystemDbContext _context;
 
-        private readonly IWorker workerService;
-        private readonly ITopic _topicService;
-        public TopicsController(EducationSystemDbContext context, ITopic topicService)
+        public TeamsController(EducationSystemDbContext context)
         {
             _context = context;
-            _topicService = topicService;
         }
 
-        // GET: Topics
+        // GET: Teams
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Topics.ToListAsync());
+            var educationSystemDbContext = _context.Teams.Include(t => t.Manager);
+            return View(await educationSystemDbContext.ToListAsync());
         }
 
-        // GET: Topics/Details/5
+        // GET: Teams/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -37,39 +34,42 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var topic = await _context.Topics
+            var team = await _context.Teams
+                .Include(t => t.Manager)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (topic == null)
+            if (team == null)
             {
                 return NotFound();
             }
 
-            return View(topic);
+            return View(team);
         }
 
-        // GET: Topics/Create
+        // GET: Teams/Create
         public IActionResult Create()
         {
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id");
             return View();
         }
 
-        // POST: Topics/Create
+        // POST: Teams/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Topic topic)
+        public async Task<IActionResult> Create([Bind("Id,TeamName,WorkerId")] Team team)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(topic);
+                _context.Add(team);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(topic);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", team.WorkerId);
+            return View(team);
         }
 
-        // GET: Topics/Edit/5
+        // GET: Teams/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,22 +77,23 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var topic = await _context.Topics.FindAsync(id);
-            if (topic == null)
+            var team = await _context.Teams.FindAsync(id);
+            if (team == null)
             {
                 return NotFound();
             }
-            return View(topic);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", team.WorkerId);
+            return View(team);
         }
 
-        // POST: Topics/Edit/5
+        // POST: Teams/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Topic topic)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TeamName,WorkerId")] Team team)
         {
-            if (id != topic.Id)
+            if (id != team.Id)
             {
                 return NotFound();
             }
@@ -101,12 +102,12 @@ namespace EducationSystem.Controllers
             {
                 try
                 {
-                    _context.Update(topic);
+                    _context.Update(team);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TopicExists(topic.Id))
+                    if (!TeamExists(team.Id))
                     {
                         return NotFound();
                     }
@@ -117,10 +118,11 @@ namespace EducationSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(topic);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", team.WorkerId);
+            return View(team);
         }
 
-        // GET: Topics/Delete/5
+        // GET: Teams/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -128,32 +130,31 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var topic = await _context.Topics
+            var team = await _context.Teams
+                .Include(t => t.Manager)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (topic == null)
+            if (team == null)
             {
                 return NotFound();
             }
 
-            return View(topic);
+            return View(team);
         }
 
-        // POST: Topics/Delete/5
+        // POST: Teams/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var topic = await _context.Topics.FindAsync(id);
-            _context.Topics.Remove(topic);
+            var team = await _context.Teams.FindAsync(id);
+            _context.Teams.Remove(team);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-   
-
-        private bool TopicExists(int id)
+        private bool TeamExists(int id)
         {
-            return _context.Topics.Any(e => e.Id == id);
+            return _context.Teams.Any(e => e.Id == id);
         }
     }
 }

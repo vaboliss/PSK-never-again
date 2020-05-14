@@ -4,7 +4,7 @@ using EducationSystem.Interfaces;
 using EducationSystem.Models;
 using EducationSystem.Data;
 
-namespace Infrastructure.Provider
+namespace EducationSystem.Provider
 {
     public class WorkerService : IWorker
     {

@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
         public string TeamName { get; set; }
-        public Worker Manager { get; set; }
+
+        public int WorkerId { get; set; }
+        public virtual Worker Manager { get; set; }
     }
 }
