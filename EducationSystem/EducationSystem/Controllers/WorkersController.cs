@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,6 +7,7 @@ using EducationSystem.Data;
 using EducationSystem.Models;
 using EducationSystem.Interfaces;
 using EducationSystem.Provider;
+using Microsoft.AspNetCore.Http;
 
 namespace EducationSystem.Controllers
 {
@@ -18,6 +17,7 @@ namespace EducationSystem.Controllers
 
         private readonly IWorker _workerService;
         private readonly ITopic _topicService;
+
         public WorkersController(EducationSystemDbContext context, IWorker workerService, ITopic topicService)
         {
             _context = context;
@@ -45,7 +45,7 @@ namespace EducationSystem.Controllers
             {
                 return NotFound();
             }
-            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id", worker.Id);
+            ViewData["Topics"] = new SelectList(_context.Topics.ToList(), nameof(Topic.Id), nameof(Topic.Name));
             return View(worker);
         }
 
@@ -151,17 +151,20 @@ namespace EducationSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        /*// POST: Workers/Delete/5
+        // POST
         [HttpPost, ActionName("AssignGoal")]
         [ValidateAntiForgeryToken]
-        public Task AssignGoal(int id)
+        public ActionResult AssignGoal(int? id, IFormCollection formCollection)
         {
             var worker = _context.Workers.Find(id);
-            if (_workerService.AssignGoal(worker, id))
+            int topicId;
+            int.TryParse(formCollection["TopicId"], out topicId);
+            if (_workerService.AssignGoal(worker, topicId))
             {
                 return RedirectToAction(nameof(Index));
             }
-        }*/
+            return RedirectToAction(nameof(Index));
+        }
 
         private bool WorkerExists(int id)
         {

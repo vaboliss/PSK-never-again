@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using EducationSystem.Interfaces;
+﻿using EducationSystem.Interfaces;
 using EducationSystem.Models;
 using EducationSystem.Data;
-using System;
 
 namespace EducationSystem.Provider
 {
@@ -35,6 +32,7 @@ namespace EducationSystem.Provider
             {
                 return false;
             }
+            _edu.SaveChanges();
             return true;
         }
     }
