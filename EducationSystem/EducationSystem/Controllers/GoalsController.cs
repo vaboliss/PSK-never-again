@@ -22,7 +22,8 @@ namespace EducationSystem.Controllers
         // GET: Goals
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Goals.ToListAsync());
+            var educationSystemDbContext = _context.Goals.Include(g => g.Topic).Include(g => g.Worker);
+            return View(await educationSystemDbContext.ToListAsync());
         }
 
         // GET: Goals/Details/5
@@ -34,6 +35,8 @@ namespace EducationSystem.Controllers
             }
 
             var goal = await _context.Goals
+                .Include(g => g.Topic)
+                .Include(g => g.Worker)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (goal == null)
             {
@@ -46,6 +49,8 @@ namespace EducationSystem.Controllers
         // GET: Goals/Create
         public IActionResult Create()
         {
+            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id");
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id");
             return View();
         }
 
@@ -54,7 +59,7 @@ namespace EducationSystem.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id")] Goal goal)
+        public async Task<IActionResult> Create([Bind("Id,TopicId,WorkerId")] Goal goal)
         {
             if (ModelState.IsValid)
             {
@@ -62,6 +67,8 @@ namespace EducationSystem.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id", goal.TopicId);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", goal.WorkerId);
             return View(goal);
         }
 
@@ -78,6 +85,8 @@ namespace EducationSystem.Controllers
             {
                 return NotFound();
             }
+            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id", goal.TopicId);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", goal.WorkerId);
             return View(goal);
         }
 
@@ -86,7 +95,7 @@ namespace EducationSystem.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id")] Goal goal)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TopicId,WorkerId")] Goal goal)
         {
             if (id != goal.Id)
             {
@@ -113,6 +122,8 @@ namespace EducationSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id", goal.TopicId);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", goal.WorkerId);
             return View(goal);
         }
 
@@ -125,6 +136,8 @@ namespace EducationSystem.Controllers
             }
 
             var goal = await _context.Goals
+                .Include(g => g.Topic)
+                .Include(g => g.Worker)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (goal == null)
             {

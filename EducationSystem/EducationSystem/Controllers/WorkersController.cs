@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EducationSystem.Data;
 using EducationSystem.Models;
 using EducationSystem.Interfaces;
+using EducationSystem.Provider;
 
 namespace EducationSystem.Controllers
 {
@@ -15,11 +16,13 @@ namespace EducationSystem.Controllers
     {
         private readonly EducationSystemDbContext _context;
 
-        private readonly IWorker workerService;
-        private readonly ITopic topicService;
-        public WorkersController(EducationSystemDbContext context)
+        private readonly IWorker _workerService;
+        private readonly ITopic _topicService;
+        public WorkersController(EducationSystemDbContext context, IWorker workerService, ITopic topicService)
         {
             _context = context;
+            _workerService = workerService;
+            _topicService = topicService;
         }
 
         // GET: Workers
@@ -42,7 +45,7 @@ namespace EducationSystem.Controllers
             {
                 return NotFound();
             }
-
+            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id", worker.Id);
             return View(worker);
         }
 
@@ -147,6 +150,18 @@ namespace EducationSystem.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        /*// POST: Workers/Delete/5
+        [HttpPost, ActionName("AssignGoal")]
+        [ValidateAntiForgeryToken]
+        public Task AssignGoal(int id)
+        {
+            var worker = _context.Workers.Find(id);
+            if (_workerService.AssignGoal(worker, id))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+        }*/
 
         private bool WorkerExists(int id)
         {

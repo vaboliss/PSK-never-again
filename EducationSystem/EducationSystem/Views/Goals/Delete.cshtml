@@ -11,6 +11,18 @@
     <h4>Goal</h4>
     <hr />
     <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Topic)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Topic.Id)
+        </dd class>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Worker)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Worker.Id)
+        </dd class>
     </dl>
     
     <form asp-action="Delete">
