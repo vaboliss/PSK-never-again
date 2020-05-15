@@ -7,16 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EducationSystem.Data;
 using EducationSystem.Models;
+using EducationSystem.Provider;
+using EducationSystem.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace EducationSystem.Controllers
 {
     public class TeamsController : Controller
     {
         private readonly EducationSystemDbContext _context;
+        private readonly IWorker _workerService;
 
-        public TeamsController(EducationSystemDbContext context)
+        public TeamsController(EducationSystemDbContext context, IWorker workerService)
         {
             _context = context;
+            _workerService = workerService;
         }
 
         // GET: Teams
@@ -41,7 +46,8 @@ namespace EducationSystem.Controllers
             {
                 return NotFound();
             }
-
+            ViewData["CurrentWorkers"] = _workerService.GetCurrentWorkers(team.Manager.Id);
+            ViewData["AvailableWorkers"] = new SelectList(_workerService.GetAvailableWorkers(team.Manager.Id), nameof(Worker.Id), nameof(Worker.FirstName));
             return View(team);
         }
 
@@ -118,7 +124,9 @@ namespace EducationSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", team.WorkerId);
+           
             return View(team);
         }
 
@@ -149,6 +157,22 @@ namespace EducationSystem.Controllers
             var team = await _context.Teams.FindAsync(id);
             _context.Teams.Remove(team);
             await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ActionName("AssignWorker")]
+        [ValidateAntiForgeryToken]
+        public ActionResult AssignWorker(int? id, IFormCollection formCollection)
+        {
+            var team = _context.Teams
+                .Include(t => t.Manager)
+                .FirstOrDefault(m => m.Id == id);
+            int workerId;
+            int.TryParse(formCollection["WorkerId"], out workerId);
+            if (_workerService.AssignWorkers(team.Manager.Id, workerId))
+            {
+                return RedirectToAction(nameof(Index));
+            }
             return RedirectToAction(nameof(Index));
         }
 
