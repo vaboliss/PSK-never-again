@@ -5,6 +5,8 @@ namespace EducationSystem.Interfaces
 {
     public interface IWorker
     {
+        int CreateWorkerRId(Worker worker);
+        void RemoveWorkerById(int id);
     }
 
 }
