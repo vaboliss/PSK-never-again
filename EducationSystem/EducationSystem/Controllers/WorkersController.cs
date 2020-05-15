@@ -45,7 +45,8 @@ namespace EducationSystem.Controllers
             {
                 return NotFound();
             }
-            ViewData["Topics"] = new SelectList(_context.Topics.ToList(), nameof(Topic.Id), nameof(Topic.Name));
+            ViewData["TopicsToAssign"] = new SelectList(_workerService.GetAvailableTopics(worker), nameof(Topic.Id), nameof(Topic.Name));
+            ViewData["WorkerGoals"] = _workerService.GetWorkerGoalsAsTopics(worker);
             return View(worker);
         }
 
