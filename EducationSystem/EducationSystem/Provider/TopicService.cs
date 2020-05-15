@@ -37,9 +37,9 @@ namespace EducationSystem.Provider
                 {
                     return workers.ToList();
                 }
-                return null;
+                return Enumerable.Empty<Worker>().ToList();
             }
-            return null;
+            return Enumerable.Empty<Worker>().ToList();
         }
     }
 }
