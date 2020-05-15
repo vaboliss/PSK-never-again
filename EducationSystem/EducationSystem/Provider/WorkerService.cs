@@ -41,10 +41,10 @@ namespace EducationSystem.Provider
         // Returns a list of topics that are assigned as goals to the particular worker
         public List<Topic> GetWorkerGoalsAsTopics (Worker worker)
         {
-            var databaseResults = _edu.Goals.Where(g => g.WorkerId == worker.Id);
-            if (databaseResults.Any())
+            var workerGoals = _edu.Goals.Where(g => g.WorkerId == worker.Id);
+            if (workerGoals.Any())
             {
-                var topics = databaseResults.Select(g => g.Topic);
+                var topics = workerGoals.Select(g => g.Topic);
                 if (topics.Any())
                 {
                     return topics.ToList();
