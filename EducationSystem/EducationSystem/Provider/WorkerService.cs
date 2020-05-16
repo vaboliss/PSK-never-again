@@ -63,7 +63,7 @@ namespace EducationSystem.Provider
                 return Enumerable.Empty<Topic>().ToList();
             }
             // First check if worker has any assigned goals, if not, all topics are available
-            var workerGoalsAsTopics = GetWorkerGoalsAsTopics(worker).ToList();
+            var workerGoalsAsTopics = GetWorkerGoalsAsTopics(worker);
             if (!workerGoalsAsTopics.Any())
             {
                 return topics;
