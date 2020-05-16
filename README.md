@@ -16,5 +16,6 @@ DevBridge project using ASP .NET Core
 1. Open Package Manager console
 2. Run command `sqllocaldb stop`
 3. Run command `sqllocaldb delete`
+4. Delete local database file in `users\{YourUser}`, file extension .mdf
 
 More documentation is in the google drive
