@@ -77,6 +77,11 @@ namespace EducationSystem.Controllers
         public async Task<IActionResult> Create( Topic topic)
         
         {
+            int redirect=default(int);
+            if (topic.Id != default(int)) {
+                redirect = topic.Id;
+                }
+
             topic.Id = default(int);
             if (topic.Parent.Id != -1)
             {
@@ -87,9 +92,15 @@ namespace EducationSystem.Controllers
             }
             if (ModelState.IsValid)
             {
-                    _context.Add(topic);
-                    await _context.SaveChangesAsync();
+                _context.Add(topic);
+                await _context.SaveChangesAsync();
+                if (redirect == default(int))
+                {
                     return RedirectToAction(nameof(Index));
+                }
+                else {
+                    return RedirectToAction(nameof(Details),new { id = redirect });
+                }
             }
 
 
