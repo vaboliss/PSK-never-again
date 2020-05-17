@@ -14,7 +14,6 @@ namespace EducationSystem.Controllers
     public class TopicsController : Controller
     {
         private readonly EducationSystemDbContext _context;
-
         private readonly IWorker workerService;
         private readonly ITopic _topicService;
         public TopicsController(EducationSystemDbContext context, ITopic topicService)
@@ -39,7 +38,6 @@ namespace EducationSystem.Controllers
 
             var topic = await _context.Topics.Include(m=>m.SubTopics)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            Console.WriteLine(topic.SubTopics.Count);
             if (topic == null)
             {
                 return NotFound();
@@ -49,13 +47,24 @@ namespace EducationSystem.Controllers
         }
 
         // GET: Topics/Create
-        public IActionResult Create()
+        public IActionResult Create(int? id)
         {
-            List<Topic> topiclist = _context.Topics.ToListAsync().Result;
-            topiclist.Insert(0,new Topic() { Id = -1, Name = "none" });
-            
-            SelectList sl2 = new SelectList(topiclist, "Id", "Name"); ;
-            ViewBag.TopicList = sl2;
+            if (id == null)
+            {
+                List<Topic> topiclist = _context.Topics.ToListAsync().Result;
+                topiclist.Insert(0, new Topic() { Id = -1, Name = "none" });
+
+                SelectList sl2 = new SelectList(topiclist, "Id", "Name"); ;
+                ViewBag.TopicList = sl2;
+            }
+            else {
+                var topic = _context.Topics.FirstOrDefaultAsync(m => m.Id == (int)id).Result;
+                List<Topic> topiclist = new List<Topic>();
+                topiclist.Add(topic);
+                SelectList sl2 = new SelectList(topiclist, "Id", "Name"); ;
+                ViewBag.TopicList = sl2;
+
+            }
             
             return View();
         }
@@ -66,15 +75,25 @@ namespace EducationSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create( Topic topic)
+        
         {
-            topic.Parent = _topicService.GetTopicById(topic.Parent.Id);
-           // Console.WriteLine(topic.Parent.Id);
+            topic.Id = default(int);
+            if (topic.Parent.Id != -1)
+            {
+                topic.Parent = _topicService.GetTopicById(topic.Parent.Id);
+            }
+            else {
+                topic.Parent = null;
+            }
             if (ModelState.IsValid)
             {
-                _context.Add(topic);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    _context.Add(topic);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
             }
+
+
+
             return View(topic);
         }
 
