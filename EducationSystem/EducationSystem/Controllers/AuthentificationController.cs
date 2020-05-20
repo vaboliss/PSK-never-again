@@ -16,16 +16,17 @@ namespace EducationSystem.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private IWorker _workerServices;
-
+        private RoleManager<IdentityRole> _roleManager;
         private SignInManager<ApplicationUser> _signInManager;
         public Authentification(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager
+            SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager
             ,IWorker workerServices)
         {
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
             _workerServices = workerServices;
+            _roleManager = roleManager;
         }
 
         public IActionResult Index()
@@ -36,10 +37,6 @@ namespace EducationSystem.Controllers
         { 
             return View();
         }
-        public IActionResult ForgotPassword()
-        {
-            return View();
-        }
         [HttpPost]
         public async Task<IActionResult> LoginUser(string username, string password)
         {
@@ -47,8 +44,7 @@ namespace EducationSystem.Controllers
 
             if (user != null)
             {
-                var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
-
+                var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Index", "Home");
@@ -67,60 +63,52 @@ namespace EducationSystem.Controllers
                 return RedirectToAction("Index", "Authentification");
             }
 
+            var isUsernameExist = await _userManager.FindByNameAsync(username);
+            if (isUsernameExist != null)
+            {
+                //failed to register
+                return RedirectToAction("Index", "Authentification");
+            }
+
+            Worker worker = new Worker()
+            {
+                FirstName = firstName,
+                LastName = lastName
+            };
+            int id = _workerServices.CreateWorkerRId(worker);
             var user = new ApplicationUser()
             {
-                UserName = username
+                UserName = username,
+                WorkerId = id
             };
-            
-            var result = await _userManager.CreateAsync(user, password);
 
-            if (result.Succeeded)
+            var createResult = await _userManager.CreateAsync(user, password);
+
+            if (createResult.Succeeded)
             {
-                Worker worker = new Worker()
+                var IsRoleExist = await _roleManager.FindByNameAsync("Worker");
+                if (IsRoleExist == null)
                 {
-                    FirstName = firstName,
-                    LastName = lastName
-                };
-                int id = _workerServices.CreateWorkerRId(worker);
-
-                user.workerId = id;
-
-                var result1 = _userManager.UpdateAsync(user);
-
-                if (result.Succeeded)
-                {
-                    var signInResult = await _signInManager.PasswordSignInAsync(user, password, false, false);
-
-                    if (signInResult.Succeeded)
+                    var roleCreated = await _roleManager.CreateAsync(new IdentityRole("Worker"));
+                    if (!roleCreated.Succeeded)
                     {
-                        return RedirectToAction("Index", "Home"); 
-                    }
-                    else
-                    {
-                        //failed to register
-                        return RedirectToAction("Register");
+                        return RedirectToAction("Index", "Authentification");
                     }
                 }
-                else
+                var AddedRole = await _userManager.AddToRoleAsync(user, "Worker");
+                if (AddedRole.Succeeded)
                 {
-                    var result2 = _userManager.DeleteAsync(user);
-                    _workerServices.RemoveWorkerById(id);
-
+                     return RedirectToAction("Index", "Home");
                 }
             }
             //failed to register
             return RedirectToAction("Index", "Authentification");
         }
-
+        [HttpPost]
         public async Task<IActionResult> LogOutAsync()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index");
-        }
-
-        public IActionResult ForgotPassword(string email)
-        {
-            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

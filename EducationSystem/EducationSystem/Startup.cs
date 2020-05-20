@@ -36,11 +36,20 @@ namespace EducationSystem
                 config.Password.RequireNonAlphanumeric = false;
                 config.Password.RequireUppercase = false;
             })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<EducationSystemDbContext>()
+                .AddSignInManager<SignInManager<ApplicationUser>>()
                 .AddDefaultTokenProviders();
 
+
+            services.AddAuthorization(options => 
+            {
+                options.AddPolicy("RequiredRoles",
+                    policy => policy.RequireRole("Worker", "Manager"));
+            });
             services.AddScoped<ITopic, TopicService>();
-            services.AddTransient<IWorker, WorkerService>();
+            services.AddScoped<IWorker, WorkerService>();
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -68,6 +77,7 @@ namespace EducationSystem
                     name: "default",
                     pattern: "{controller=Authentification}/{action=Index}/{id?}");
             });
+
         }
     }
 }

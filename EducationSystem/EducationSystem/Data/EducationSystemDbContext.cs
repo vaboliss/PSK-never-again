@@ -1,4 +1,5 @@
 ﻿using EducationSystem.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,9 @@ namespace EducationSystem.Data
 {
     public class EducationSystemDbContext : IdentityDbContext<ApplicationUser>
     {
-        public EducationSystemDbContext(DbContextOptions options) : base(options) { }
+        public EducationSystemDbContext(DbContextOptions options) : base(options)
+        {
+        }
 
         public DbSet<Topic> Topics { get; set; }
         public DbSet<LearningDay> LearningDays { get; set; }
@@ -25,7 +28,7 @@ namespace EducationSystem.Data
             modelBuilder.Entity<LearningDay>();
             modelBuilder.Entity<Restriction>();
             modelBuilder.Entity<WorkerTopic>().HasKey(wt => new { wt.WorkerId, wt.TopicId });
-            modelBuilder.Entity<ApplicationUser>().HasIndex(wt => wt.workerId).IsUnique();
+            modelBuilder.Entity<ApplicationUser>().HasIndex(wt => wt.WorkerId).IsUnique();
             base.OnModelCreating(modelBuilder);
 
         }
