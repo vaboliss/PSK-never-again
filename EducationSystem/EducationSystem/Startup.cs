@@ -1,4 +1,9 @@
 using EducationSystem.Areas.Identity;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using EducationSystem.Data;
 using EducationSystem.Interfaces;
 using EducationSystem.Models;
@@ -11,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 
 namespace EducationSystem
@@ -86,7 +92,7 @@ namespace EducationSystem
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
-
+            app.UseStaticFiles();
         }
     }
 }
