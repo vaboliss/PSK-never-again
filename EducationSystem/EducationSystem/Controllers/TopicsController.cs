@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EducationSystem.Data;
 using EducationSystem.Models;
@@ -15,7 +12,6 @@ namespace EducationSystem.Controllers
     {
         private readonly EducationSystemDbContext _context;
 
-        private readonly IWorker workerService;
         private readonly ITopic _topicService;
         public TopicsController(EducationSystemDbContext context, ITopic topicService)
         {

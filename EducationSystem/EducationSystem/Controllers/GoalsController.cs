@@ -5,33 +5,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EducationSystem.Data;
 using EducationSystem.Models;
-using EducationSystem.Interfaces;
-using EducationSystem.Provider;
-using Microsoft.AspNetCore.Http;
 
 namespace EducationSystem.Controllers
 {
-    public class WorkersController : Controller
+    public class GoalsController : Controller
     {
         private readonly EducationSystemDbContext _context;
 
-        private readonly IWorker _workerService;
-        private readonly ITopic _topicService;
-
-        public WorkersController(EducationSystemDbContext context, IWorker workerService, ITopic topicService)
+        public GoalsController(EducationSystemDbContext context)
         {
             _context = context;
-            _workerService = workerService;
-            _topicService = topicService;
         }
 
-        // GET: Workers
+        // GET: Goals
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Workers.ToListAsync());
+            var educationSystemDbContext = _context.Goals.Include(g => g.Topic).Include(g => g.Worker);
+            return View(await educationSystemDbContext.ToListAsync());
         }
 
-        // GET: Workers/Details/5
+        // GET: Goals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,40 +32,45 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var worker = await _context.Workers
+            var goal = await _context.Goals
+                .Include(g => g.Topic)
+                .Include(g => g.Worker)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (worker == null)
+            if (goal == null)
             {
                 return NotFound();
             }
-            ViewData["TopicsToAssign"] = new SelectList(_workerService.GetAvailableTopics(worker), nameof(Topic.Id), nameof(Topic.Name));
-            ViewData["WorkerGoals"] = _workerService.GetWorkerGoalsAsTopics(worker);
-            return View(worker);
+
+            return View(goal);
         }
 
-        // GET: Workers/Create
+        // GET: Goals/Create
         public IActionResult Create()
         {
+            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id");
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id");
             return View();
         }
 
-        // POST: Workers/Create
+        // POST: Goals/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName")] Worker worker)
+        public async Task<IActionResult> Create([Bind("Id,TopicId,WorkerId")] Goal goal)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(worker);
+                _context.Add(goal);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(worker);
+            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id", goal.TopicId);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", goal.WorkerId);
+            return View(goal);
         }
 
-        // GET: Workers/Edit/5
+        // GET: Goals/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -80,22 +78,24 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var worker = await _context.Workers.FindAsync(id);
-            if (worker == null)
+            var goal = await _context.Goals.FindAsync(id);
+            if (goal == null)
             {
                 return NotFound();
             }
-            return View(worker);
+            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id", goal.TopicId);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", goal.WorkerId);
+            return View(goal);
         }
 
-        // POST: Workers/Edit/5
+        // POST: Goals/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName")] Worker worker)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TopicId,WorkerId")] Goal goal)
         {
-            if (id != worker.Id)
+            if (id != goal.Id)
             {
                 return NotFound();
             }
@@ -104,12 +104,12 @@ namespace EducationSystem.Controllers
             {
                 try
                 {
-                    _context.Update(worker);
+                    _context.Update(goal);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!WorkerExists(worker.Id))
+                    if (!GoalExists(goal.Id))
                     {
                         return NotFound();
                     }
@@ -120,10 +120,12 @@ namespace EducationSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(worker);
+            ViewData["TopicId"] = new SelectList(_context.Topics, "Id", "Id", goal.TopicId);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", goal.WorkerId);
+            return View(goal);
         }
 
-        // GET: Workers/Delete/5
+        // GET: Goals/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -131,45 +133,32 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var worker = await _context.Workers
+            var goal = await _context.Goals
+                .Include(g => g.Topic)
+                .Include(g => g.Worker)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (worker == null)
+            if (goal == null)
             {
                 return NotFound();
             }
 
-            return View(worker);
+            return View(goal);
         }
 
-        // POST: Workers/Delete/5
+        // POST: Goals/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var worker = await _context.Workers.FindAsync(id);
-            _context.Workers.Remove(worker);
+            var goal = await _context.Goals.FindAsync(id);
+            _context.Goals.Remove(goal);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        // POST
-        [HttpPost, ActionName("AssignGoal")]
-        [ValidateAntiForgeryToken]
-        public ActionResult AssignGoal(int? id, IFormCollection formCollection)
+        private bool GoalExists(int id)
         {
-            var worker = _context.Workers.Find(id);
-            int topicId;
-            int.TryParse(formCollection["TopicId"], out topicId);
-            if (_workerService.AssignGoal(worker, topicId))
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool WorkerExists(int id)
-        {
-            return _context.Workers.Any(e => e.Id == id);
+            return _context.Goals.Any(e => e.Id == id);
         }
     }
 }
