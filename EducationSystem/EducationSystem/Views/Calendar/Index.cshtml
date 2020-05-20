@@ -2,29 +2,47 @@
 @{
     ViewData["Title"] = "Index";
 }
-<head>
-    <meta charset='utf-8' />
+    <head>
+        <meta charset='utf-8' />
 
-    <link href='~/fullcalendar/packages/core/main.css' rel='stylesheet' />
-    <link href='~/fullcalendar/packages/daygrid/main.css' rel='stylesheet' />
+        <link href='~/fullcalendar/packages/core/main.css' rel='stylesheet' />
+        <link href='~/fullcalendar/packages/daygrid/main.css' rel='stylesheet' />
 
-    <script src='~/fullcalendar/packages/core/main.js'></script>
-    <script src='~/fullcalendar/packages/daygrid/main.js'></script>
+        <script src='~/fullcalendar/packages/core/main.js'></script>
+        <script src='~/fullcalendar/packages/interaction/main.js'></script>
+        <script src='~/fullcalendar/packages/daygrid/main.js'></script>
+        <script src='~/fullcalendar/packages/moment/main.js'></script>
 
-    <script>
+        <script>
 
-    document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
+            document.addEventListener('DOMContentLoaded', function () {
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        plugins: [ 'dayGrid' ]
-    });
+                var calendarEl = document.getElementById('calendar');
 
-    calendar.render();
-    });
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    plugins: ['interaction', 'dayGrid'],
+                    selectable: true,
+                    droppable: true,
+                    eventLimit: true,
+                    select: function (start) {
+                        var title = prompt("Topic:");
+                        var eventData;
+                        if (title) {
+                            eventData = {
+                                title: title,
+                                start: start,
+                                allDay: true
+                            };
+                            calendar.addEvent(eventData);
+                        }
+                    }
+                });
 
-    </script>
-</head>
+                calendar.render();
+            });
+
+        </script>
+    </head>
 
 <body>
 
