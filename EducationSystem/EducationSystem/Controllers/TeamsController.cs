@@ -176,6 +176,32 @@ namespace EducationSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        [HttpPost, ActionName("DeleteWorker")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteWorker(int? id, int? managerId)
+        {
+            if (id == null  ||managerId==null)
+            {
+                return NotFound();
+            }
+            var manager = _context.Workers.Include(t => t.Subordinates)
+                 .FirstOrDefault(m => m.Id == managerId);
+            if (manager == null)
+            {
+                return NotFound();
+            }
+            manager.Subordinates.Remove(_context.Workers.Find(id));
+          
+
+
+           // var team = await _context.Teams.FindAsync(id);
+            //_context.Teams.Remove(team);
+             _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
+
+
         private bool TeamExists(int id)
         {
             return _context.Teams.Any(e => e.Id == id);

@@ -19,19 +19,27 @@ namespace EducationSystem.Provider
 
         public List<Worker> GetAvailableWorkers(int managerId)
         {
+            var allworkers = _edu.Workers.Include(t => t.Subordinates).ToList();
 
-            var workers = _edu.Workers.ToList();
+            var availableWorkers = _edu.Workers.ToList();
             var manager = _edu.Workers.Include(t => t.Subordinates)
                 .FirstOrDefault(m => m.Id == managerId);
 
-            // TO DO: Remove All higher lever workers.
-            workers.RemoveAll(w => manager.Subordinates.Contains(w));
-            workers.Remove(manager);
-           
-
-            if (workers.Any())
+            foreach (Worker worker in allworkers)
             {
-                return workers;
+                availableWorkers.RemoveAll(w => worker.Subordinates.Contains(w));
+            }
+
+            availableWorkers.RemoveAll(w => w.Subordinates.Count != 0);
+            availableWorkers.Remove(manager);
+            // TO DO: Remove All higher lever workers.
+            //availableWorkers.RemoveAll(w => manager.Subordinates.Contains(w));
+
+
+
+            if (availableWorkers.Any())
+            {
+                return availableWorkers;
             }
             return Enumerable.Empty<Worker>().ToList();
         }
