@@ -212,7 +212,7 @@ namespace EducationSystem.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteWorker(int? id, int? managerId)
         {
-            if (id == null  ||managerId==null)
+            if (id == null || managerId == null)
             {
                 return NotFound();
             }

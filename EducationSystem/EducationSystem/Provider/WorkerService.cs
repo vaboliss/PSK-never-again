@@ -120,7 +120,7 @@ namespace EducationSystem.Provider
             var manager = _edu.Workers.Include(t => t.Subordinates)
                 .FirstOrDefault(m => m.Id == managerId);
 
-            if (manager == null || worker==null)
+            if (manager == null || worker == null)
             {
                 return false;
             }
