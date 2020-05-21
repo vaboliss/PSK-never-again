@@ -1,0 +1,25 @@
+﻿body {
+}
+
+#external-events {
+    position: fixed;
+    z-index: 10;
+    top: 20px;
+    left: 20px;
+    width: 200px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    background: #eee;
+}
+
+p {
+    text-align: center;
+    font-size: 1vw;
+}
+
+.draggable-element {
+    margin: 1em 0;
+    cursor: move;
+    border: 1px solid #ccc;
+    background: #3788d8;
+}

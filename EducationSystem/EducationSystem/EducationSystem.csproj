@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\css\calendarView.css" />
     <None Include="wwwroot\fullcalendar\packages\bootstrap\LICENSE.txt" />
     <None Include="wwwroot\fullcalendar\packages\bootstrap\main.css" />
     <None Include="wwwroot\fullcalendar\packages\bootstrap\main.esm.js" />
