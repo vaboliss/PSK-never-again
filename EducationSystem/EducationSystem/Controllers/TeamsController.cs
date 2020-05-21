@@ -54,7 +54,15 @@ namespace EducationSystem.Controllers
         // GET: Teams/Create
         public IActionResult Create()
         {
-            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id");
+            var workers = _context.Workers.ToList();
+            IEnumerable<SelectListItem> selectList = from s in workers
+                                                     select new SelectListItem
+                                                     {
+                                                         Value = s.Id.ToString(),
+                                                         Text = s.FirstName +" "+ s.LastName
+                                                     };
+
+            ViewData["WorkerId"] = new SelectList(selectList, "Value", "Text");
             return View();
         }
 
@@ -65,8 +73,26 @@ namespace EducationSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TeamName,WorkerId")] Team team)
         {
+
             if (ModelState.IsValid)
             {
+
+                var isManager = _context.Teams.Where(t=> t.WorkerId==team.WorkerId).ToList();
+                if (isManager.Any())
+                {
+                    ModelState.AddModelError("", "This person is already a manager");
+                    var workers = _context.Workers.ToList();
+                    IEnumerable<SelectListItem> selectList = from s in workers
+                                                            select new SelectListItem
+                                                            {
+                                                                Value = s.Id.ToString(),
+                                                                Text = s.FirstName + " " + s.LastName
+                                                            };
+
+                    ViewData["WorkerId"] = new SelectList(selectList, "Value", "Text");
+                    return View(team);
+                    
+                }
                 _context.Add(team);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -145,7 +171,6 @@ namespace EducationSystem.Controllers
             {
                 return NotFound();
             }
-
             return View(team);
         }
 
@@ -154,7 +179,13 @@ namespace EducationSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
+            var team = await _context.Teams.Include(t => t.Manager).Include(t => t.Manager.Subordinates)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (team.Manager.Subordinates != null)
+            {
+                ModelState.AddModelError("", "You can't delete a team whitch have workers");
+                return View(team);
+            }
             _context.Teams.Remove(team);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -192,11 +223,7 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
             manager.Subordinates.Remove(_context.Workers.Find(id));
-          
 
-
-           // var team = await _context.Teams.FindAsync(id);
-            //_context.Teams.Remove(team);
              _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }

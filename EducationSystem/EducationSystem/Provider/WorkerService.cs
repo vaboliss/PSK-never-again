@@ -90,10 +90,7 @@ namespace EducationSystem.Provider
 
             availableWorkers.RemoveAll(w => w.Subordinates.Count != 0);
             availableWorkers.Remove(manager);
-            // TO DO: Remove All higher lever workers.
             //availableWorkers.RemoveAll(w => manager.Subordinates.Contains(w));
-
-
 
             if (availableWorkers.Any())
             {
@@ -103,8 +100,6 @@ namespace EducationSystem.Provider
         }
         public List<Worker> GetCurrentWorkers(int managerId)
         {
-
-
             var manager = _edu.Workers.Include(t => t.Subordinates)
                  .FirstOrDefault(m => m.Id == managerId);
 
@@ -119,8 +114,6 @@ namespace EducationSystem.Provider
 
         public bool AssignWorkers(int managerId, int workerId)
         {
-
-
             //var manager = _edu.Workers.Find(managerId);
             var worker = _edu.Workers.Find(workerId);
 
@@ -136,7 +129,6 @@ namespace EducationSystem.Provider
             _edu.Update(manager);
             _edu.SaveChanges();
             return true;
-            
         }
 
 
