@@ -29,8 +29,7 @@
                 itemSelector: '.draggable-element',
                 eventData: function (eventEl) {
                     return {
-                        title: eventEl.innerText,
-                        start: '12:00:00'
+                        title: eventEl.innerText
                     };
                 }
             });
@@ -43,13 +42,12 @@
                 droppable: true,
                 eventLimit: true,
                 displayEventTime: false,
-                eventReceive: function (info) {
-                    var parsedId = parseToId(info.event.title).toString();
+                drop: function (info) {
+                    var eventId = info.draggedEl.getAttribute("eventId");
                     var answer = confirm("Assign new learning day on selected time slot?");
                     if (answer) {
-                        var data0 = { Id: parseInt(parsedId), Title: info.event.title, Start: info.event.start.toJSON() };
+                        var data0 = { Id: parseInt(eventId), Title: info.draggedEl.innerText, Start: info.date };
                         var json = JSON.stringify(data0);
-                        debugger;
                         $.ajax({
                             type: "POST",
                             url: '/Calendar/CreateLearningDay',
@@ -58,22 +56,23 @@
                             data: json,
                             success: function (results, responseText) {
                                 console.log("success : " + responseText);
+                                location.reload();
+                                return;
                             },
                             error: function (status, error) {
                                 console.log("error : " + status + error);
-                                var id = info.event.id;
-                                info.event.revert();
+                                info.revert();
                                 return;
                             }
                         }).done(function (results) {
                             console.log("done : " + results);
                         });
                     } else {
-                        info.event.revert();
+                        info.revert();
                         return;
                     }
                 },
-                select: function (start) {
+                select: function (start) { // TO-DO: Add new topic
                     var title = prompt("Topic:");
                     var eventData;
                     if (title) {
@@ -109,7 +108,7 @@
             var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
             foreach (var item in suggestedTopics)
             {
-                <div class="draggable-element">@item.Title [@item.Id]</div>
+                <div class="draggable-element" eventId="@item.Id">@item.Title</div>
             }
         }
     </div>
