@@ -22,6 +22,7 @@ namespace EducationSystem.Controllers
             return View();
         }
 
+        // Creates a list of learning days for the calendar to display
         [HttpGet]
         public IActionResult GetLearningDays()
         {
@@ -39,6 +40,7 @@ namespace EducationSystem.Controllers
             return Json(calendarEvents);
         }
 
+        // Creates a ViewBag of Suggested Topics aka Goals
         public void GetSuggestedTopics()
         {
             List<EventViewModel> suggestedTopics = new List<EventViewModel>();
@@ -46,42 +48,29 @@ namespace EducationSystem.Controllers
             foreach (Goal goal in goals)
             {
                 EventViewModel tempEvent = new EventViewModel();
-                tempEvent.Id = goal.Id;
+                tempEvent.Id = goal.Topic.Id;
                 tempEvent.Title = goal.Topic.Name;
                 suggestedTopics.Add(tempEvent);
             }
             ViewData["SuggestedTopics"] = suggestedTopics;
         }
 
-        /*
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName")] Worker worker)
+        // Creates LearningDay entity from the calendar
+        [HttpPost]
+        public IActionResult CreateLearningDay([FromBody] EventViewModel eventModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(worker);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                Topic topic = _context.Find<Topic>(eventModel.Id);
+                LearningDay learningDay = new LearningDay();
+                learningDay.Topic = topic;
+                learningDay.TopicId = topic.Id;
+                learningDay.Date = eventModel.Start;
+                _context.Add(learningDay);
+                _context.SaveChanges();
+                return View(learningDay);
             }
-            return View(worker);
-        }*/
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CreateLearningDay(int topicId) // REIKIA PADUOTI EVENTO DUOMENIS KAD SUKURT NAUJA LEARNING DAY
-        {
-            Topic topic = _context.Find<Topic>(topicId);
-            LearningDay learningDay = new LearningDay();
-            learningDay.Topic = topic;
-            learningDay.TopicId = topic.Id;
-            List<EventViewModel> suggestedTopics = new List<EventViewModel>();
-            List<Goal> goals = _context.Goals.Include(ld => ld.Topic).ToList();
-            foreach (Goal goal in goals)
-            {
-                EventViewModel tempEvent = new EventViewModel();
-                tempEvent.Id = goal.Id;
-                tempEvent.Title = goal.Topic.Name;
-                suggestedTopics.Add(tempEvent);
-            }
-            ViewData["SuggestedTopics"] = suggestedTopics;
+            return View(Index());
         }
     }
 }

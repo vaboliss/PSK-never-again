@@ -19,6 +19,8 @@
 
             var Calendar = FullCalendar.Calendar;
             var Draggable = FullCalendarInteraction.Draggable;
+            const regexId = /\[\d*\]/gm;
+            const regexIdNumber = /\d/gm;
 
             var calendarEl = document.getElementById('calendar');
             var draggableEl = document.getElementById('external-events');
@@ -27,7 +29,8 @@
                 itemSelector: '.draggable-element',
                 eventData: function (eventEl) {
                     return {
-                        title: eventEl.innerText
+                        title: eventEl.innerText,
+                        start: '12:00:00'
                     };
                 }
             });
@@ -35,20 +38,39 @@
             var calendar = new Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid'],
                 events: '/Calendar/GetLearningDays',
+                timeZone: 'UTC',
                 selectable: true,
                 droppable: true,
                 eventLimit: true,
                 displayEventTime: false,
-                drop: function (info) {
-                    info.draggedEl.parentNode.removeChild(info.draggedEl);
-                    var event = dragged[1];
-                    var answer = confirm("Assign learning day?")
+                eventReceive: function (info) {
+                    var parsedId = parseToId(info.event.title).toString();
+                    var answer = confirm("Assign new learning day on selected time slot?");
                     if (answer) {
+                        var data0 = { Id: parseInt(parsedId), Title: info.event.title, Start: info.event.start.toJSON() };
+                        var json = JSON.stringify(data0);
+                        debugger;
                         $.ajax({
-                            url: '/Calendar/CreateLearningDay?topicId=' + event.id,
-                            dataType: 'json',
-                            async: false
+                            type: "POST",
+                            url: '/Calendar/CreateLearningDay',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            data: json,
+                            success: function (results, responseText) {
+                                console.log("success : " + responseText);
+                            },
+                            error: function (status, error) {
+                                console.log("error : " + status + error);
+                                var id = info.event.id;
+                                info.event.revert();
+                                return;
+                            }
+                        }).done(function (results) {
+                            console.log("done : " + results);
                         });
+                    } else {
+                        info.event.revert();
+                        return;
                     }
                 },
                 select: function (start) {
@@ -65,6 +87,12 @@
                 }
             });
 
+            function parseToId (title) {
+                var parsedString = regexId.exec(title);
+                var temp = parsedString.toString();
+                var parsedNumber = regexIdNumber.exec(temp);
+                return parsedNumber;
+            }
             calendar.render();
         });
     </script>
@@ -81,7 +109,7 @@
             var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
             foreach (var item in suggestedTopics)
             {
-                <div class="draggable-element">@item.Title</div>
+                <div class="draggable-element">@item.Title [@item.Id]</div>
             }
         }
     </div>
