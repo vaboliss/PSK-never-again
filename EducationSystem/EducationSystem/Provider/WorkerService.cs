@@ -5,6 +5,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using EducationSystem.Static;
 
 namespace EducationSystem.Provider
 {
@@ -74,8 +75,6 @@ namespace EducationSystem.Provider
             topics.RemoveAll(t => workerGoalsAsTopics.Contains(t));
             return topics;
         }
-
-
         public List<Worker> GetAvailableWorkers(int managerId)
         {
             var allworkers = _edu.Workers.Include(t => t.Subordinates).ToList();
@@ -146,6 +145,28 @@ namespace EducationSystem.Provider
             _edu.Update(manager);
             _edu.SaveChanges();
             return true;
+        }
+        public bool SetRestriction(Worker worker, Restriction restriction)
+        {
+            if (restriction.MaxConsecutiveDays >= 0 && value <= 3)
+                GlobalRestrictions.MaxConsecutiveDays = value;
+            if (value >= 0 && value <= 12)
+                GlobalRestrictions.MaxPerYear = value;
+        }
+        public void SetMaxPerYear(int value)
+        {
+            if (value >= 0 && value <= 12)
+                GlobalRestrictions.MaxPerYear = value;
+        }
+        public void SetMaxPerMonth(int value)
+        {
+            if (value >= 0 && value <= 3)
+                GlobalRestrictions.MaxPerMonth = value;
+        }
+        public void SetMaxPerQuarter(int value)
+        {
+            if (value >= 0 && value <= 3)
+                GlobalRestrictions.MaxPerQuarter = value;
         }
     }
 }
