@@ -77,10 +77,23 @@
                             return;
                         }
                     },
-                    dateClick: function (info) { // TO-DO: Add new topic
+                    dateClick: function (info) {
                         $("#create-topic-dialog").dialog('open');
                         clickedDate = info.date;
-                    }
+                    }/*,
+                    eventClick: function (info) {
+                        info.el.style.borderColor = 'red';
+                        debugger;
+                        var tooltip = info.el.tooltip({
+                            content: info.event.title,
+                            track: true
+                        });
+                        var tooltipElement = document.getElementById('event-tooltip');
+
+                        debugger;
+                        info.el.appendChild(tooltipElement);
+                        tooltip.tooltip('toggle');
+                    }*/
                 });
 
                 function validateForm() {
@@ -214,5 +227,6 @@
         </div>
         <div id="validation-dialog" title="Topic cannot be empty"></div>
         <div id="confirm-dialog" title="Confirm action">A new topic will be created. This action cannot be undone.</div>
+        <div id="event-tooltip"></div>
     </body>
 
