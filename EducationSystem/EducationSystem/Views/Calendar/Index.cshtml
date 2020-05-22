@@ -29,6 +29,7 @@
 
                 var calendarEl = document.getElementById('calendar');
                 var draggableEl = document.getElementById('external-events');
+                var clickedDate;
 
                 new Draggable(draggableEl, {
                     itemSelector: '.draggable-element',
@@ -43,7 +44,6 @@
                     plugins: ['interaction', 'dayGrid'],
                     events: '/Calendar/GetLearningDays',
                     timeZone: 'UTC',
-                    selectable: true,
                     droppable: true,
                     eventLimit: true,
                     displayEventTime: false,
@@ -61,7 +61,7 @@
                                 data: json,
                                 success: function (results, responseText) {
                                     console.log("success : " + responseText);
-                                    location.reload();
+                                    location.reload(true);
                                     return;
                                 },
                                 error: function (status, error) {
@@ -77,18 +77,103 @@
                             return;
                         }
                     },
-                    select: function (start) { // TO-DO: Add new topic
+                    dateClick: function (info) { // TO-DO: Add new topic
                         $("#create-topic-dialog").dialog('open');
+                        clickedDate = info.date;
                     }
                 });
 
+                function validateForm() {
+                    var x = document.forms["topicForm"]["topic-name"].value;
+                    if (x == "") {
+                        $("#validation-dialog").dialog('open');
+                        return false;
+                    }
+                    return true;
+                }
+
+                // Necessary to load dialog from jquery-ui
                 $.noConflict();
                 $(function () {
                     $("#create-topic-dialog").dialog({
                         autoOpen: false,
+                        draggable: false,
+                        resizable: false,
                         buttons: [
                             {
                                 text: "Submit",
+                                click: function () {
+                                    if (!validateForm()) {
+                                        return;
+                                    }
+                                    $("#confirm-dialog").dialog('open');
+                                }
+                            }
+                        ]
+                    });
+                });
+
+                $(function () {
+                    $("#validation-dialog").dialog({
+                        closeOnEscape: false,
+                        autoOpen: false,
+                        draggable: false,
+                        resizable: false,
+                        buttons: [
+                            {
+                                text: "OK",
+                                click: function () {
+                                    $(this).dialog("close");
+                                }
+                            }
+                        ]
+                    });
+                });
+
+                $(function () {
+                    $("#confirm-dialog").dialog({
+                        closeOnEscape: false,
+                        autoOpen: false,
+                        resizable: false,
+                        dialogClass: "no-close",
+                        buttons: [
+                            {
+                                text: "Confirm",
+                                click: function () {
+                                    var topicName = document.forms["topicForm"]["topic-name"].value;
+                                    var topicDescription = document.forms["topicForm"]["topic-description"].value;
+
+                                    var data0 = { TopicName: topicName, TopicDescription: topicDescription, Start: clickedDate };
+                                    var json = JSON.stringify(data0);
+                                    debugger;
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '/Calendar/CreateLearningDayAndTopic',
+                                        contentType: "application/json; charset=utf-8",
+                                        dataType: "json",
+                                        data: json,
+                                        success: function (results, responseText) {
+                                            console.log("success : " + responseText);
+                                            $('#calendar').html(res).delay(1000);
+                                            return;
+                                        },
+                                        error: function (status, error) {
+                                            console.log("error : " + status + error);
+                                            return;
+                                        }
+                                    }).done(function (results) {
+                                        console.log("done : " + results);
+                                    });
+
+                                    $("#topic-name").value = "";
+                                    $("topic-description").value = "";
+                                    $(this).dialog("close");
+                                    $("#create-topic-dialog").dialog('close');
+                                    location.reload(true);
+                                }
+                            },
+                            {
+                                text: "Cancel",
                                 click: function () {
                                     $(this).dialog("close");
                                 }
@@ -102,32 +187,32 @@
         </script>
     </head>
 
-<body>
+    <body>
 
-    <h1>Education calendar</h1>
-    <div id="external-events">
-        <p>
-            <strong>Suggested topics (goals)</strong>
-        </p>
-        @{
-            var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
-            foreach (var item in suggestedTopics)
-            {
-                <div class="draggable-element" eventId="@item.Id">@item.Title</div>
+        <h1>Education calendar</h1>
+        <div id="external-events">
+            <p>
+                <strong>Suggested topics (goals)</strong>
+            </p>
+            @{
+                var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
+                foreach (var item in suggestedTopics)
+                {
+                    <div class="draggable-element" eventId="@item.Id">@item.Title</div>
+                }
             }
-        }
-    </div>
-    <div id="calendar"></div>
-    <div id="create-topic-dialog" title="Create new topic and goal on selected date">
-        <p class="validateTips">All form fields are required</p>
-        <form>
-            <fieldset>
-                <label for="topic-name">Topic name</label>
-                <input type="text" name="topic-name" id="topic-name" class="text">
-                <label for="topic-description">Email</label>
-                <input type="text" name="topic-description" id="topic-description" value="" class="text">
-            </fieldset>
-        </form>
-    </div>
-</body>
+        </div>
+        <div id="calendar"></div>
+        <div id="create-topic-dialog" title="Create new topic">
+            <form name="topicForm">
+                <fieldset>
+                    <input type="text" name="topic-name" id="topic-name" class="text" placeholder="Topic">
+                    <input type="text" name="topic-description" id="topic-description" class="text" placeholder="Description">
+                </fieldset>
+            </form>
+            <p class="validateTips">All fields are required</p>
+        </div>
+        <div id="validation-dialog" title="Topic cannot be empty"></div>
+        <div id="confirm-dialog" title="Confirm action">A new topic will be created. This action cannot be undone.</div>
+    </body>
 

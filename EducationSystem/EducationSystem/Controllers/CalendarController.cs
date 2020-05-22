@@ -79,5 +79,32 @@ namespace EducationSystem.Controllers
             }
             return View(Index());
         }
+
+        // Creates LearningDay entity from the calendar
+        [HttpPost]
+        public IActionResult CreateLearningDayAndTopic([FromBody] EventViewModel eventModel)
+        {
+            if (ModelState.IsValid)
+            {
+                Worker worker = _context.Find<Worker>(1);   // TO-DO: Should use logged in worker Id
+
+                Topic topic = new Topic();
+                topic.Name = eventModel.TopicName;
+                topic.Description = eventModel.TopicDescription;
+                _context.Add(topic);
+
+                LearningDay learningDay = new LearningDay();
+                learningDay.Topic = topic;
+                learningDay.TopicId = topic.Id;
+                learningDay.Worker = worker;
+                learningDay.WorkerId = worker.Id;
+                learningDay.Date = eventModel.Start;
+                _context.Add(learningDay);
+
+                _context.SaveChanges();
+                return View(learningDay);
+            }
+            return View(Index());
+        }
     }
 }

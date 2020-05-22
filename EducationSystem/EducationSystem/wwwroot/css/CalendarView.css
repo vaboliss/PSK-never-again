@@ -23,3 +23,7 @@ p {
     border: 1px solid #ccc;
     background: #3788d8;
 }
+
+.no-close .ui-dialog-titlebar-close {
+    display: none;
+}
