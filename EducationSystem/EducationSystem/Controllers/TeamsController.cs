@@ -10,6 +10,7 @@ using EducationSystem.Models;
 using EducationSystem.Provider;
 using EducationSystem.Interfaces;
 using Microsoft.AspNetCore.Http;
+using System.Data.Entity.Infrastructure;
 
 namespace EducationSystem.Controllers
 {
@@ -109,7 +110,9 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var team = await _context.Teams.FindAsync(id);
+            var team = await _context.Teams.Include(i => i.Manager)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == id);
             if (team == null)
             {
                 return NotFound();
@@ -123,37 +126,82 @@ namespace EducationSystem.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TeamName,WorkerId")] Team team)
+        public async Task<IActionResult> Edit(int id,byte[] rowVersion)
         {
-            if (id != team.Id)
+            if (id == null)
             {
                 return NotFound();
             }
+            
+            
+            var teamToUpdate = await _context.Teams.Include(i => i.Manager).Include(t => t.Manager.Subordinates).FirstOrDefaultAsync(m => m.Id == id);
+            
+            if (teamToUpdate == null)
+            {
+                Team deletedTeam = new Team();
+                await TryUpdateModelAsync(deletedTeam);
+                ModelState.AddModelError(string.Empty,
+                    "Unable to save changes. The Team was deleted by another user.");
+                ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", deletedTeam.WorkerId);
+                return View(deletedTeam);
+            }
 
-            if (ModelState.IsValid)
+            if (teamToUpdate.Manager.Subordinates.Count() != 0)
+            {
+                ModelState.AddModelError("", "You can't change team manager which has workers");
+                ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", teamToUpdate.WorkerId);
+                return View(teamToUpdate);
+            }
+
+            _context.Entry(teamToUpdate).Property("RowVersion").OriginalValue = rowVersion;
+
+            if (await TryUpdateModelAsync<Team>(
+        teamToUpdate,
+        "",
+        s => s.TeamName, s => s.WorkerId))
             {
                 try
                 {
-                    _context.Update(team);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException ex)
                 {
-                    if (!TeamExists(team.Id))
+                    var exceptionEntry = ex.Entries.Single();
+                    var clientValues = (Team)exceptionEntry.Entity;
+                    var databaseEntry = exceptionEntry.GetDatabaseValues();
+                    if (databaseEntry == null)
                     {
-                        return NotFound();
+                        ModelState.AddModelError(string.Empty,
+                            "Unable to save changes. The Team was deleted by another user.");
                     }
                     else
                     {
-                        throw;
+                        var databaseValues = (Team)databaseEntry.ToObject();
+
+                        if (databaseValues.TeamName != clientValues.TeamName)
+                        {
+                            ModelState.AddModelError("TeamName", $"Current value: {databaseValues.TeamName}");
+                        }
+                        if (databaseValues.WorkerId != clientValues.WorkerId)
+                        {
+                            Worker databaseWorker = await _context.Workers.FirstOrDefaultAsync(i => i.Id == databaseValues.WorkerId);
+                            ModelState.AddModelError("WorkerId", $"Current value: {databaseWorker?.LastName+ databaseWorker?.FirstName}");
+                        }
+
+                        ModelState.AddModelError(string.Empty, "The record you attempted to edit "
+                                + "was modified by another user after you got the original value. The "
+                                + "edit operation was canceled and the current values in the database "
+                                + "have been displayed. If you still want to edit this record, click "
+                                + "the Save button again. Otherwise click the Back to List hyperlink.");
+                        teamToUpdate.RowVersion = (byte[])databaseValues.RowVersion;
+                        ModelState.Remove("RowVersion");
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-
-            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", team.WorkerId);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", teamToUpdate.WorkerId);
            
-            return View(team);
+            return View(teamToUpdate);
         }
 
         // GET: Teams/Delete/5
@@ -181,7 +229,7 @@ namespace EducationSystem.Controllers
         {
             var team = await _context.Teams.Include(t => t.Manager).Include(t => t.Manager.Subordinates)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (team.Manager.Subordinates != null)
+            if (team.Manager.Subordinates.Count() != 0)
             {
                 ModelState.AddModelError("", "You can't delete a team which has workers");
                 return View(team);
