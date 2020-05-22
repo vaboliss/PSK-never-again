@@ -145,18 +145,7 @@ namespace EducationSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Workers(int id)
-        {
-            var workers = _topicService.GetWorkersByTopic(id);
-            if (workers is null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                return View(workers);
-            }
-        }
+   
 
         private bool TopicExists(int id)
         {
