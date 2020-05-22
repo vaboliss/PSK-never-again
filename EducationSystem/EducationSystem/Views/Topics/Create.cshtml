@@ -1,5 +1,5 @@
 ﻿@using EducationSystem.Models
-@model EducationSystem.Models.Topic
+@model EducationSystem.Models.TopicCreateViewModel
 
 
 @{
@@ -7,13 +7,23 @@
 }
 
 <h1>Create</h1>
-
-<h4>Topic</h4>
+@if (ViewBag.Parent != null)
+{
+    <h4>Create Subtopic</h4>
+}
+else
+{
+    <h4>Create Topic</h4>
+}
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create" >
-             @Html.DropDownListFor(m => m.Parent.Id, ViewBag.TopicList as SelectList, new { @class = "form-control" }) 
+        <form asp-action="Create">
+            @if (ViewBag.Parent != null)
+            {
+                <h5>This subtopic has a parent @ViewBag.Parent.Name</h5>
+                @Html.HiddenFor(x => x.ParentId,new { Value = @ViewBag.Parent.Id });
+            }
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -22,7 +32,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
+                <textarea asp-for="Description" class="form-control">Type description</textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">

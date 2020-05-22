@@ -49,24 +49,23 @@ namespace EducationSystem.Controllers
         // GET: Topics/Create
         public IActionResult Create(int? id)
         {
+            TopicCreateViewModel tcm=new TopicCreateViewModel();
             if (id == null)
             {
                 List<Topic> topiclist = _context.Topics.ToListAsync().Result;
                 topiclist.Insert(0, new Topic() { Id = -1, Name = "none" });
 
-                SelectList sl2 = new SelectList(topiclist, "Id", "Name"); ;
-                ViewBag.TopicList = sl2;
+                Topic parent= null;
+                ViewBag.Parent = parent;
             }
             else {
-                var topic = _context.Topics.FirstOrDefaultAsync(m => m.Id == (int)id).Result;
-                List<Topic> topiclist = new List<Topic>();
-                topiclist.Add(topic);
-                SelectList sl2 = new SelectList(topiclist, "Id", "Name"); ;
-                ViewBag.TopicList = sl2;
+                tcm.ParentId = (int)id;
+                Topic parent = _context.Topics.FirstOrDefaultAsync(m => m.Id == (int)id).Result;
+                ViewBag.Parent = parent;
 
             }
             
-            return View();
+            return View(tcm);
         }
 
         // POST: Topics/Create
@@ -74,25 +73,24 @@ namespace EducationSystem.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( Topic topic)
+        public async Task<IActionResult> Create( TopicCreateViewModel topic)
         
         {
+            Topic topicToCreate = new Topic() { Name = topic.Name, Description = topic.Description };
             int redirect=default(int);
-            if (topic.Id != default(int)) {
+            if (topic.ParentId != default(int)) {
                 redirect = topic.Id;
                 }
 
-            topic.Id = default(int);
-            if (topic.Parent.Id != -1)
+            if (topic.ParentId != default(int))
             {
-                topic.Parent = _topicService.GetTopicById(topic.Parent.Id);
+                topicToCreate.Parent = _topicService.GetTopicById(topic.ParentId);
             }
-            else {
-                topic.Parent = null;
-            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(topic);
+
+                _context.Add(topicToCreate);
                 await _context.SaveChangesAsync();
                 if (redirect == default(int))
                 {
@@ -103,7 +101,11 @@ namespace EducationSystem.Controllers
                 }
             }
 
+            List<Topic> topiclist = _context.Topics.ToListAsync().Result;
+            topiclist.Insert(0, new Topic() { Id = -1, Name = "none" });
 
+            SelectList sl2 = new SelectList(topiclist, "Id", "Name"); ;
+            ViewBag.TopicList = sl2;
 
             return View(topic);
         }
@@ -156,6 +158,7 @@ namespace EducationSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             return View(topic);
         }
 
