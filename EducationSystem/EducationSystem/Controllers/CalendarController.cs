@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace EducationSystem.Controllers
 {
@@ -48,13 +49,14 @@ namespace EducationSystem.Controllers
         [HttpGet]
         public IActionResult GetWorkerRestrictions()        //  TO-DO: Worker Id should be equal to current logged in user Id
         {
-            Worker worker = _context.Find<Worker>(2);
+            Worker worker = _context.Find<Worker>(1);
             if (worker == null)
             {
                 return NotFound();
             }
-            Restriction restriction = _context.Find<Restriction>(2);
-            return Json(restriction);
+            Restriction restriction = _context.Find<Restriction>(1);
+            var jsonData = JsonSerializer.Serialize(restriction);
+            return Json(jsonData);
         }
 
         // Creates a ViewBag of Suggested Topics aka Goals
