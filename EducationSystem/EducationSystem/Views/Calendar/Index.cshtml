@@ -26,10 +26,16 @@
 
                 var Calendar = FullCalendar.Calendar;
                 var Draggable = FullCalendarInteraction.Draggable;
-
                 var calendarEl = document.getElementById('calendar');
                 var draggableEl = document.getElementById('external-events');
                 var clickedDate;
+                var workerRestrictions;
+
+                $.get("/Calendar/GetWorkerRestrictions", function (data, status) {
+                    workerRestrictions = data;
+                    console.log("success : " + status);
+                });
+                debugger;
 
                 new Draggable(draggableEl, {
                     itemSelector: '.draggable-element',

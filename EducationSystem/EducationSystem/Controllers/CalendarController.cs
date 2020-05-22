@@ -44,6 +44,19 @@ namespace EducationSystem.Controllers
             return Json(calendarEvents);
         }
 
+        // Returns worker restrictions
+        [HttpGet]
+        public IActionResult GetWorkerRestrictions()        //  TO-DO: Worker Id should be equal to current logged in user Id
+        {
+            Worker worker = _context.Find<Worker>(2);
+            if (worker == null)
+            {
+                return NotFound();
+            }
+            Restriction restriction = _context.Find<Restriction>(2);
+            return Json(restriction);
+        }
+
         // Creates a ViewBag of Suggested Topics aka Goals
         public void GetSuggestedTopics()
         {

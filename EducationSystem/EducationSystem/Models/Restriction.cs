@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace EducationSystem.Models
 {
     public class Restriction
@@ -10,5 +9,6 @@ namespace EducationSystem.Models
         public int MaxConsecutiveDays { get; set; }
         public int MaxPerMonth { get; set; }
         public int MaxPerYear { get; set; }
+        public int MaxPerQuarter { get; set; }
     }
 }
