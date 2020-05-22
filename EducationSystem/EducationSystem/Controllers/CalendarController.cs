@@ -66,7 +66,7 @@ namespace EducationSystem.Controllers
             if (ModelState.IsValid)
             {
                 Topic topic = _context.Find<Topic>(eventModel.Id);
-                Worker worker = _context.Find<Worker>(1);
+                Worker worker = _context.Find<Worker>(1);   // TO-DO: Should use logged in worker Id
                 LearningDay learningDay = new LearningDay();
                 learningDay.Topic = topic;
                 learningDay.TopicId = topic.Id;
