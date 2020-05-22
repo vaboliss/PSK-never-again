@@ -64,6 +64,7 @@ namespace EducationSystem
             services.AddSingleton<IEmailSender, EmailSender>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddScoped<ILearningDay, LearningDayService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
