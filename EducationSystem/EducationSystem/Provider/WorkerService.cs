@@ -146,27 +146,5 @@ namespace EducationSystem.Provider
             _edu.SaveChanges();
             return true;
         }
-        public bool SetRestriction(Worker worker, Restriction restriction)
-        {
-            if (restriction.MaxConsecutiveDays >= 0 && value <= 3)
-                GlobalRestrictions.MaxConsecutiveDays = value;
-            if (value >= 0 && value <= 12)
-                GlobalRestrictions.MaxPerYear = value;
-        }
-        public void SetMaxPerYear(int value)
-        {
-            if (value >= 0 && value <= 12)
-                GlobalRestrictions.MaxPerYear = value;
-        }
-        public void SetMaxPerMonth(int value)
-        {
-            if (value >= 0 && value <= 3)
-                GlobalRestrictions.MaxPerMonth = value;
-        }
-        public void SetMaxPerQuarter(int value)
-        {
-            if (value >= 0 && value <= 3)
-                GlobalRestrictions.MaxPerQuarter = value;
-        }
     }
 }
