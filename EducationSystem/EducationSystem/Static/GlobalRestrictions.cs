@@ -1,6 +1,4 @@
 ﻿
-using EducationSystem.Models;
-
 namespace EducationSystem.Static
 {
     public static class GlobalRestrictions

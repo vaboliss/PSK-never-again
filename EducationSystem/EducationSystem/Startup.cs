@@ -65,6 +65,7 @@ namespace EducationSystem
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddScoped<ILearningDay, LearningDayService>();
+            services.AddScoped<IGlobalRestrictions, GlobalRestrictionsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
