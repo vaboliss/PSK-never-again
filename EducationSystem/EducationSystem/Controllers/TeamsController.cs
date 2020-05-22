@@ -183,7 +183,7 @@ namespace EducationSystem.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (team.Manager.Subordinates != null)
             {
-                ModelState.AddModelError("", "You can't delete a team which have workers");
+                ModelState.AddModelError("", "You can't delete a team which has workers");
                 return View(team);
             }
             _context.Teams.Remove(team);
