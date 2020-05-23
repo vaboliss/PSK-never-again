@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using EducationSystem.Data;
 using EducationSystem.Models;
 using EducationSystem.Interfaces;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace EducationSystem.Controllers
 {
