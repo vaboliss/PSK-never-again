@@ -1,3 +1,4 @@
+using EducationSystem.Areas.Identity;
 using EducationSystem.Data;
 using EducationSystem.Interfaces;
 using EducationSystem.Models;
@@ -6,6 +7,8 @@ using Infrastructure.Provider;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +25,6 @@ namespace EducationSystem
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
@@ -41,15 +43,22 @@ namespace EducationSystem
                 .AddSignInManager<SignInManager<ApplicationUser>>()
                 .AddDefaultTokenProviders();
 
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+            .AddRazorPagesOptions(options =>
+            { 
+                options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+            });
 
-            services.AddAuthorization(options => 
+            services.ConfigureApplicationCookie(options =>
             {
-                options.AddPolicy("RequiredRoles",
-                    policy => policy.RequireRole("Worker", "Manager"));
+                options.LoginPath = $"/Identity/Account/Login";
+                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
             });
             services.AddScoped<ITopic, TopicService>();
             services.AddScoped<IWorker, WorkerService>();
-
+            services.AddSingleton<IEmailSender, EmailSender>();
+            services.AddControllersWithViews();
+            services.AddRazorPages();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -75,7 +84,8 @@ namespace EducationSystem
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Authentification}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
 
         }

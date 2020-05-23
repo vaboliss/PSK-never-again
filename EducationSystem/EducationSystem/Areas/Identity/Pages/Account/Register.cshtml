@@ -1,0 +1,63 @@
+﻿@page
+@model RegisterModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Log in";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EducationSystem</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row mx-auto">
+            <div class="col-lg-8 col-sm-6"></div>
+            <div class="col-lg-3 col-sm-6 my-5">
+                <div class="card card-signin my-5">
+                    <div class="card-body ">
+                        <h5 class="card-title text-center">Register</h5>
+                        <form class="form-signin" id="account" method="post">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="Input.Username"></label>
+                                <input asp-for="Input.Username" class="form-control" />
+                                <span asp-validation-for="Input.Username" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Input.Email"></label>
+                                <input asp-for="Input.Email" class="form-control" />
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Input.FirstName"></label>
+                                <input asp-for="Input.FirstName" class="form-control" />
+                                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Input.LastName"></label>
+                                <input asp-for="Input.LastName" class="form-control" />
+                                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Input.Password"></label>
+                                <input asp-for="Input.Password" class="form-control" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Register</button>
+                            <hr class="my-4">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

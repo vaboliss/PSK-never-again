@@ -17,13 +17,11 @@ namespace EducationSystem.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private IWorker _workerServices;
         private RoleManager<IdentityRole> _roleManager;
-        private SignInManager<ApplicationUser> _signInManager;
         public AccountController(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager
             , IWorker workerServices)
         { 
             _userManager = userManager;
-            _signInManager = signInManager;
             _workerServices = workerServices;
             _roleManager = roleManager;
         }
@@ -32,33 +30,22 @@ namespace EducationSystem.Controllers
         {
             return View();
         }
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-        public ActionResult CreateNew()
-        {
-            return View();
-        }
-
         [HttpPost]
         public async Task<IActionResult> CreateNew(string email, string username, string firstName, string lastName)
         {
-
             var isUsernameExist = await _userManager.FindByNameAsync(username);
             if (isUsernameExist != null)
             {
-                //failed to register
-                //Username is taken
-                return RedirectToAction("Index", "Authentification");
+                TempData["Message"] = "Username is taken";
+                return RedirectToAction("Index");
             }
 
             var isEmailExist = await _userManager.FindByEmailAsync(email);
 
             if (isEmailExist != null)
             {
-                //email already exists
-                return RedirectToAction("Index", "Authentification");
+                TempData["Message"] = "Email is taken";
+                return RedirectToAction("Index");
             }
             Worker worker = new Worker()
             {
@@ -83,14 +70,13 @@ namespace EducationSystem.Controllers
                     var roleCreated = await _roleManager.CreateAsync(new IdentityRole("Worker"));
                     if (!roleCreated.Succeeded)
                     {
-                        //failed in creating role
-                        return RedirectToAction("Index", "Authentification");
+                        TempData["Message"] = "Error creating an role";
+                        return RedirectToAction("Index");
                     }
                 }
                 var AddedRole = await _userManager.AddToRoleAsync(user, "Worker");
                 if (AddedRole.Succeeded)
                 {
-                    //send email
                     MailMessage mail = new MailMessage();
 
                     mail.From = new MailAddress("educationsystemmail@gmail.com");
@@ -109,13 +95,13 @@ namespace EducationSystem.Controllers
                         smtp.Send(mail);
                     }
 
-                    return RedirectToAction("Index", "Home");
+                    TempData["Message"] = "Invitation sent";
+                    return RedirectToAction("Index");
                 }
             }
 
-
-            //failed to create user
-            return RedirectToAction("Index", "Authentification");
+            TempData["Message"] = "Created an user failed";
+            return RedirectToAction("Index");
 
         }
         public string GeneratePassword(int lowercase, int uppercase, int numerics)

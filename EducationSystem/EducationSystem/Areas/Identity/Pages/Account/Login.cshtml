@@ -1,6 +1,9 @@
-﻿
+﻿@page
+@model LoginModel
+
 @{
     Layout = null;
+    ViewData["Title"] = "Log in";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -19,16 +22,21 @@
                 <div class="card card-signin my-5">
                     <div class="card-body ">
                         <h5 class="card-title text-center">Sign In</h5>
-                        <form class="form-signin" action="/Authentification/LoginUser" method="post">
-                            <div class="form-label-group">
-                                <input type="text" name="username" id="inputEmail" class="form-control" placeholder="Username" required autofocus autocomplete="off">
+                        <form class="form-signin" id="account" method="post">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="Input.Credential"></label>
+                                <input asp-for="Input.Credential" class="form-control" />
+                                <span asp-validation-for="Input.Credential" class="text-danger"></span>
                             </div>
-                            <div class="form-label-group">
-                                <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required autocomplete="off"> <label for="inputPassword"></label>
+                            <div class="form-group">
+                                <label asp-for="Input.Password"></label>
+                                <input asp-for="Input.Password" class="form-control" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
                             </div>
+
                             <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Sign in</button>
-                            <hr class="my-4">
-                            <!--<button class="btn btn-lg btn-facebook btn-block text-uppercase" type="submit"><i class="fab fa-facebook-f mr-2"></i> Sign in with Facebook</button>-->
+                            <hr class="my-4"> 
                         </form>
                     </div>
                 </div>
@@ -37,3 +45,6 @@
     </div>
 </body>
 </html>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

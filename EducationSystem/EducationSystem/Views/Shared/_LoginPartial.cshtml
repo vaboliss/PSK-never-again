@@ -5,21 +5,22 @@
     <ul class="navbar-nav">
         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Manager"))
         {
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown">
-                    Manager  @User.Identity.Name
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                    <li>Create new User</li>
-                    <li>Account details</li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <form class="form-inline" method="post" asp-controller="Authentification" aspcontroller="LogOutAsync">
-                    <input class="nav-link btn btn-link text-dark" type="submit" value="Logout" />
-                </form>
-            </li>
+        <li class="nav-item dropdown">
+            <a class="dropdown-toggle text-dark" data-toggle="dropdown">
+                Manager  @User.Identity.Name
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+                <li><a class="nav-link btn btn-link text-dark" asp-controller="Account" aspcontroller="CreateNew">Create new User</a></li>
+                <li><a class="nav-link btn btn-link text-dark" href="/Identity/Account/Manage">Account Details</a></li>
+                <li class="divider"></li>
+                <li>
+                    <form class="input-group" method="post" action="/Authentification/LogOut">
+                        <input class="ml-3 nav-link btn btn-link text-dark" type="submit" value="Sign Out" />
+                    </form>
+                </li>
+            </ul>
+        </li>
         }
         else
         {
@@ -29,10 +30,9 @@
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a class="nav-link btn btn-link text-dark" asp-controller="Account" aspcontroller="CreateNew">Create new User</a></li>
-                    <li><a class="nav-link btn btn-link text-dark" asp-controller="Account" aspcontroller="Details">Account Details</a></li>
+                    <li><a class="nav-link btn btn-link text-dark" href="/Identity/Account/Manage">Account Details</a></li>
                     <li class="divider"></li>
-                    <li><form class="input-group" method="post" asp-controller="Authentification" aspcontroller="LogOutAsync">
+                    <li><form class="input-group" method="post" action="/Authentification/LogOut">
                                 <input class="ml-3 nav-link btn btn-link text-dark" type="submit" value="Sign Out" />
                             </form>
                     </li>

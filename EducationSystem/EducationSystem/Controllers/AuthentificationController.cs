@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using EducationSystem.Models;
 using Microsoft.AspNetCore.Identity;
 using EducationSystem.Interfaces;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace EducationSystem.Controllers
 {
@@ -28,35 +29,22 @@ namespace EducationSystem.Controllers
             _workerServices = workerServices;
             _roleManager = roleManager;
         }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
         public IActionResult Register()
-        { 
+        {
             return View();
         }
-        [HttpPost]
-        public async Task<IActionResult> LoginUser(string username, string password)
+
+        public async Task<IActionResult> LogOut()
         {
-            var user = await _userManager.FindByNameAsync(username);
+            await _signInManager.SignOutAsync();
 
-            if (user != null)
-            {
-                var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-            }
-            return RedirectToAction("Index");
-
-          
+            return RedirectToAction("Index","Home");
         }
+
         [HttpPost]
         public async Task<IActionResult> RegisterUser(string username, string firstName, string lastName, string password, string repeatedPassword)
         {
+            var userdd = HttpContext.User;
             if (password != repeatedPassword)
             {
                 //failed to register
@@ -104,13 +92,6 @@ namespace EducationSystem.Controllers
             //failed to register
             return RedirectToAction("Index", "Authentification");
         }
-        [HttpPost]
-        public async Task<IActionResult> LogOutAsync()
-        {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index");
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

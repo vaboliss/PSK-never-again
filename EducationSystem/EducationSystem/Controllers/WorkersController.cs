@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using EducationSystem.Data;
 using EducationSystem.Models;
 using EducationSystem.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EducationSystem.Controllers
 {
+    [Authorize(Roles ="Worker")]
     public class WorkersController : Controller
     {
         private readonly EducationSystemDbContext _context;
