@@ -28,27 +28,36 @@
                 var Draggable = FullCalendarInteraction.Draggable;
                 var calendarEl = document.getElementById('calendar');
                 var draggableEl = document.getElementById('external-events');
+                var currentYearEvents;
+                var Q1events;
+                var Q2events;
+                var Q3events;
+                var Q4events;
+                var quarterEvents = [0, 0, 0, 0, 0];
                 var clickedDate;
                 var workerRestrictions;
 
                 $.get("/Calendar/GetWorkerRestrictions", function (data, status) {
-                    debugger;
-                    workerRestrictions = data;
+                    workerRestrictions = JSON.parse(data);
                 });
-                debugger;
 
                 new Draggable(draggableEl, {
                     itemSelector: '.draggable-element',
                     eventData: function (eventEl) {
                         return {
-                            title: eventEl.innerText
+                            title: eventEl.innerText,
+                            overlap: false
                         };
                     }
                 });
 
                 var calendar = new Calendar(calendarEl, {
                     plugins: ['interaction', 'dayGrid'],
-                    events: '/Calendar/GetLearningDays',
+                    events:
+                    {
+                        url: '/Calendar/GetLearningDays',
+                        overlap: false
+                    },
                     timeZone: 'UTC',
                     droppable: true,
                     eventLimit: true,
@@ -83,9 +92,12 @@
                             return;
                         }
                     },
-                    dateClick: function (info) {
+                    dateClick: function (info) {        // Checking if event can be created on date should be done here as well
                         $("#create-topic-dialog").dialog('open');
                         clickedDate = info.date;
+                    },
+                    eventAllow: function (dropInfo, draggedEvent) { // Handles checking if event can be dropped on date
+                        return dateAllowed(dropInfo.start);
                     }/*,
                     eventClick: function (info) {
                         info.el.style.borderColor = 'red';
@@ -200,6 +212,48 @@
                         ]
                     });
                 });
+
+                // Returns quarter (1, 2, 3, 4) of the specified date
+                function getQuarter(date) {
+                    var month = date.getMonth() + 1;
+                    return (Math.ceil(month / 3));
+                }
+
+                // Returns number of events in specified quarter
+                function getQuarterEvents(quarter, events) {
+                    var quarterEvents = 0;
+                    events.forEach(function (item, index) {
+                        var q = getQuarter(item.start);
+                        if (q == quarter)
+                            quarterEvents++;
+                    });
+                    return quarterEvents;
+                }
+
+                // Returns number of events in specified year
+                function getEventsByYear(year) {
+                    var yearEvents = calendar.getEvents().filter(function (event) {
+                        return event.start.getFullYear() === year;
+                    });
+                    return yearEvents;
+                }
+
+                // Checks date against restrictions
+                function dateAllowed(date) {
+                    if (date < new Date()) {          // Chosen date must be later than current day
+                        return false;
+                    }
+                    var yearEvents = getEventsByYear(date.getFullYear());
+                    var quarter = getQuarter(date);
+                    if (getQuarterEvents(quarter, yearEvents) >= workerRestrictions.MaxPerQuarter) {    // Is quarter limit reached
+                        return false;
+                    }
+                    debugger;
+                    if (yearEvents.length >= workerRestrictions.MaxPerYear) {   // Is year limit reached
+                        return false;
+                    }
+                    return true;
+                }
 
                 calendar.render();
             });
