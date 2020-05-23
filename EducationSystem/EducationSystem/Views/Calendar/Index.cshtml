@@ -28,12 +28,6 @@
                 var Draggable = FullCalendarInteraction.Draggable;
                 var calendarEl = document.getElementById('calendar');
                 var draggableEl = document.getElementById('external-events');
-                var currentYearEvents;
-                var Q1events;
-                var Q2events;
-                var Q3events;
-                var Q4events;
-                var quarterEvents = [0, 0, 0, 0, 0];
                 var clickedDate;
                 var workerRestrictions;
 
@@ -101,6 +95,15 @@
                     eventAllow: function (dropInfo, draggedEvent) { // Handles checking if event can be dropped on date
                         return dateAllowed(dropInfo.start);
                     }/*,
+                    eventMouseEnter: function (info) {
+                        var tooltip = '<div class="tooltip">';
+                        tooltip += '<h2>' + info.event.title + '</h2>';
+                        $(tooltip).appendTo('body');
+                        showTooltip(info);
+                    },
+                    eventMouseLeave: function (info) {
+                        hideTooltip(info);
+                    },
                     eventClick: function (info) {
                         info.el.style.borderColor = 'red';
                         debugger;

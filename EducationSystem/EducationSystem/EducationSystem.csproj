@@ -29,10 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\fullcalendar\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\css\calendarView.css" />
     <None Include="wwwroot\fullcalendar\packages\bootstrap\LICENSE.txt" />
     <None Include="wwwroot\fullcalendar\packages\bootstrap\main.css" />
@@ -208,32 +204,12 @@
     <None Include="wwwroot\fullcalendar\packages\daygrid\main.min.css" />
     <None Include="wwwroot\fullcalendar\packages\daygrid\main.min.js" />
     <None Include="wwwroot\fullcalendar\packages\daygrid\README.md" />
-    <None Include="wwwroot\fullcalendar\packages\google-calendar\LICENSE.txt" />
-    <None Include="wwwroot\fullcalendar\packages\google-calendar\main.esm.js" />
-    <None Include="wwwroot\fullcalendar\packages\google-calendar\main.js" />
-    <None Include="wwwroot\fullcalendar\packages\google-calendar\main.js.map" />
-    <None Include="wwwroot\fullcalendar\packages\google-calendar\main.min.js" />
-    <None Include="wwwroot\fullcalendar\packages\google-calendar\README.md" />
     <None Include="wwwroot\fullcalendar\packages\interaction\LICENSE.txt" />
     <None Include="wwwroot\fullcalendar\packages\interaction\main.esm.js" />
     <None Include="wwwroot\fullcalendar\packages\interaction\main.js" />
     <None Include="wwwroot\fullcalendar\packages\interaction\main.js.map" />
     <None Include="wwwroot\fullcalendar\packages\interaction\main.min.js" />
     <None Include="wwwroot\fullcalendar\packages\interaction\README.md" />
-    <None Include="wwwroot\fullcalendar\packages\list\LICENSE.txt" />
-    <None Include="wwwroot\fullcalendar\packages\list\main.css" />
-    <None Include="wwwroot\fullcalendar\packages\list\main.esm.js" />
-    <None Include="wwwroot\fullcalendar\packages\list\main.js" />
-    <None Include="wwwroot\fullcalendar\packages\list\main.js.map" />
-    <None Include="wwwroot\fullcalendar\packages\list\main.min.css" />
-    <None Include="wwwroot\fullcalendar\packages\list\main.min.js" />
-    <None Include="wwwroot\fullcalendar\packages\list\README.md" />
-    <None Include="wwwroot\fullcalendar\packages\luxon\LICENSE.txt" />
-    <None Include="wwwroot\fullcalendar\packages\luxon\main.esm.js" />
-    <None Include="wwwroot\fullcalendar\packages\luxon\main.js" />
-    <None Include="wwwroot\fullcalendar\packages\luxon\main.js.map" />
-    <None Include="wwwroot\fullcalendar\packages\luxon\main.min.js" />
-    <None Include="wwwroot\fullcalendar\packages\luxon\README.md" />
     <None Include="wwwroot\fullcalendar\packages\moment-timezone\LICENSE.txt" />
     <None Include="wwwroot\fullcalendar\packages\moment-timezone\main.esm.js" />
     <None Include="wwwroot\fullcalendar\packages\moment-timezone\main.js" />
@@ -246,20 +222,6 @@
     <None Include="wwwroot\fullcalendar\packages\moment\main.js.map" />
     <None Include="wwwroot\fullcalendar\packages\moment\main.min.js" />
     <None Include="wwwroot\fullcalendar\packages\moment\README.md" />
-    <None Include="wwwroot\fullcalendar\packages\rrule\LICENSE.txt" />
-    <None Include="wwwroot\fullcalendar\packages\rrule\main.esm.js" />
-    <None Include="wwwroot\fullcalendar\packages\rrule\main.js" />
-    <None Include="wwwroot\fullcalendar\packages\rrule\main.js.map" />
-    <None Include="wwwroot\fullcalendar\packages\rrule\main.min.js" />
-    <None Include="wwwroot\fullcalendar\packages\rrule\README.md" />
-    <None Include="wwwroot\fullcalendar\packages\timegrid\LICENSE.txt" />
-    <None Include="wwwroot\fullcalendar\packages\timegrid\main.css" />
-    <None Include="wwwroot\fullcalendar\packages\timegrid\main.esm.js" />
-    <None Include="wwwroot\fullcalendar\packages\timegrid\main.js" />
-    <None Include="wwwroot\fullcalendar\packages\timegrid\main.js.map" />
-    <None Include="wwwroot\fullcalendar\packages\timegrid\main.min.css" />
-    <None Include="wwwroot\fullcalendar\packages\timegrid\main.min.js" />
-    <None Include="wwwroot\fullcalendar\packages\timegrid\README.md" />
   </ItemGroup>
 
 </Project>
