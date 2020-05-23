@@ -6,7 +6,7 @@
 
         <link href='~/fullcalendar/packages/core/main.css' rel='stylesheet' />
         <link href='~/fullcalendar/packages/daygrid/main.css' rel='stylesheet' />
-        <link href='~/css/calendarView.css' rel='stylesheet' />
+        <link href='~/css/CalendarView.css' rel='stylesheet' />
         <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
 
         <script src='~/fullcalendar/packages/core/main.js'></script>
@@ -93,8 +93,10 @@
                         }
                     },
                     dateClick: function (info) {        // Checking if event can be created on date should be done here as well
-                        $("#create-topic-dialog").dialog('open');
-                        clickedDate = info.date;
+                        if (dateAllowed(info.date)) {
+                            $("#create-topic-dialog").dialog('open');
+                            clickedDate = info.date;
+                        }
                     },
                     eventAllow: function (dropInfo, draggedEvent) { // Handles checking if event can be dropped on date
                         return dateAllowed(dropInfo.start);
