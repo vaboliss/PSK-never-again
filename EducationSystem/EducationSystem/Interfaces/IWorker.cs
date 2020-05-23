@@ -7,6 +7,17 @@ namespace EducationSystem.Interfaces
     {
         int CreateWorkerRId(Worker worker);
         void RemoveWorkerById(int id);
+
+        public List<Worker> GetAvailableWorkers(int managerId);
+        public bool  AssignWorkers(int managerId, int workerId);
+        public List<Worker> GetCurrentWorkers(int managerId);
+
+        bool AssignGoal(Worker worker, int topicId);
+
+        public List<Topic> GetWorkerGoalsAsTopics(Worker worker);
+
+        public List<Topic> GetAvailableTopics(Worker worker);
+
     }
 
 }

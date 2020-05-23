@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,6 +7,9 @@ using EducationSystem.Data;
 using EducationSystem.Models;
 using EducationSystem.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using EducationSystem.Provider;
+using Microsoft.AspNetCore.Http;
+
 
 namespace EducationSystem.Controllers
 {
@@ -17,11 +18,14 @@ namespace EducationSystem.Controllers
     {
         private readonly EducationSystemDbContext _context;
 
-        private readonly IWorker workerService;
-        private readonly ITopic topicService;
-        public WorkersController(EducationSystemDbContext context)
+        private readonly IWorker _workerService;
+        private readonly ITopic _topicService;
+
+        public WorkersController(EducationSystemDbContext context, IWorker workerService, ITopic topicService)
         {
             _context = context;
+            _workerService = workerService;
+            _topicService = topicService;
         }
 
         // GET: Workers
@@ -44,7 +48,8 @@ namespace EducationSystem.Controllers
             {
                 return NotFound();
             }
-
+            ViewData["TopicsToAssign"] = new SelectList(_workerService.GetAvailableTopics(worker), nameof(Topic.Id), nameof(Topic.Name));
+            ViewData["WorkerGoals"] = _workerService.GetWorkerGoalsAsTopics(worker);
             return View(worker);
         }
 
@@ -147,6 +152,21 @@ namespace EducationSystem.Controllers
             var worker = await _context.Workers.FindAsync(id);
             _context.Workers.Remove(worker);
             await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST
+        [HttpPost, ActionName("AssignGoal")]
+        [ValidateAntiForgeryToken]
+        public ActionResult AssignGoal(int? id, IFormCollection formCollection)
+        {
+            var worker = _context.Workers.Find(id);
+            int topicId;
+            int.TryParse(formCollection["TopicId"], out topicId);
+            if (_workerService.AssignGoal(worker, topicId))
+            {
+                return RedirectToAction(nameof(Index));
+            }
             return RedirectToAction(nameof(Index));
         }
 
