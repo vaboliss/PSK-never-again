@@ -1,0 +1,78 @@
+﻿@model EducationSystem.Models.Team
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Team</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TeamName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TeamName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Manager)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Manager.FirstName)
+        </dd>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Manager.LastName)
+        </dd>
+    </dl>
+</div>
+
+@{
+    <h5>Team members</h5>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            First Name
+        </dt>
+        <dt class="col-sm-10">
+            Last Name
+        </dt>
+    </dl>
+    var workers = ViewBag.CurrentWorkers as ICollection<Worker>;
+    foreach (var item in workers)
+    {
+<form asp-action="DeleteWorker">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <dl class="row">
+
+        <dd class="col-sm-2">
+            @item.FirstName
+        </dd>
+        <dd class="col-sm-2">
+            @item.LastName
+        </dd>
+        <div class="form-group">
+            <input asp-action="DeleteWorker" asp-route-id="@item.Id" asp-route-managerId="@Model.Manager.Id" type="submit" value="Remove Worker" class="btn btn-primary" />
+        </div>
+    </dl>
+</form>
+
+}
+}
+
+
+<form asp-action="AssingWorker">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label class="control-label"></label>
+        <select class="form-control" asp-items="ViewBag.AvailableWorkers" name="WorkerId"></select>
+    </div>
+    <div class="form-group">
+        <input asp-action="AssignWorker" asp-route-id="@Model.Id" type="submit" value="Assign worker" class="btn btn-primary" />
+    </div>
+</form>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

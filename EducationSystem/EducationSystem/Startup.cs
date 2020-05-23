@@ -31,7 +31,7 @@ namespace EducationSystem
             services.AddDbContext<EducationSystemDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("EducationSystemDbContext")));
             services.AddScoped<ITopic, TopicService>();
-            services.AddRazorPages();
+            services.AddScoped<IWorker, WorkerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

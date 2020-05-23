@@ -17,29 +17,29 @@ namespace EducationSystem.Provider
 
         public Topic GetTopicById(int id)
         {
-            var databaseResult = _edu.Topics.Where(t=> t.Id == id);
+            var topic = _edu.Topics.Where(t=> t.Id == id);
 
-            if (databaseResult.Any())
+            if (topic.Any())
             {
-                return databaseResult.First();
+                return topic.First();
             }
             return null;
         }
 
         public List<Worker> GetWorkersByTopic(int topicId)
         {
-            var databaseResults = _edu.WorkerTopics.Where(x => x.TopicId == topicId);
+            var workersByTopic = _edu.WorkerTopics.Where(x => x.TopicId == topicId);
 
-            if (databaseResults.Any())
+            if (workersByTopic.Any())
             {
-                var workers = databaseResults.Select(w => w.Worker);
+                var workers = workersByTopic.Select(w => w.Worker);
                 if (workers.Any())
                 {
                     return workers.ToList();
                 }
-                return null;
+                return Enumerable.Empty<Worker>().ToList();
             }
-            return null;
+            return Enumerable.Empty<Worker>().ToList();
         }
     }
 }
