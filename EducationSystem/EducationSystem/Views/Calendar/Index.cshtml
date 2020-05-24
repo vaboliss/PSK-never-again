@@ -12,7 +12,7 @@
         <script src='~/fullcalendar/packages/core/main.js'></script>
         <script src='~/fullcalendar/packages/interaction/main.js'></script>
         <script src='~/fullcalendar/packages/daygrid/main.js'></script>
-        <script src='~/fullcalendar/packages/moment/main.js'></script>
+        <script src='~/fullcalendar/packages/moment/main.min.js'></script>
         <script src="https://code.jquery.com/jquery-3.5.1.min.js"
                 integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
                 crossorigin="anonymous"></script>
@@ -23,6 +23,12 @@
         <script>
 
             document.addEventListener('DOMContentLoaded', function () {
+
+                const dateViolation = "Chosen date must be later than current day";
+                const monthLimitViolation = "Month limit reached";
+                const quarterLimitViolation = "Quarter limit reached";
+                const yearLimitViolation = "Year limit reached";
+                const monthName = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
                 var Calendar = FullCalendar.Calendar;
                 var Draggable = FullCalendarInteraction.Draggable;
@@ -46,7 +52,7 @@
                 });
 
                 var calendar = new Calendar(calendarEl, {
-                    plugins: ['interaction', 'dayGrid'],
+                    plugins: ['interaction', 'dayGrid', 'moment'],
                     events:
                     {
                         url: '/Calendar/GetLearningDays',
@@ -224,6 +230,17 @@
                     return (Math.ceil(month / 3));
                 }
 
+                // Returns number of events in specified month
+                function getMonthEvents(month, events) {
+                    var monthEvents = 0;
+                    events.forEach(function (item, index) {
+                        var m = item.start.getMonth();
+                        if (m == month)
+                            monthEvents++;
+                    });
+                    return monthEvents;
+                }
+
                 // Returns number of events in specified quarter
                 function getQuarterEvents(quarter, events) {
                     var quarterEvents = 0;
@@ -246,17 +263,29 @@
                 // Checks date against restrictions
                 function dateAllowed(date) {
                     if (date < new Date()) {          // Chosen date must be later than current day
+                        document.getElementById("restriction-warning-container").style.display = "block";
+                        document.getElementById("violated-restriction").innerText = dateViolation;
                         return false;
                     }
                     var yearEvents = getEventsByYear(date.getFullYear());
+                    if (getMonthEvents(date.getMonth(), yearEvents) >= workerRestrictions.MaxPerMonth) {    // Is month limit reached
+                        document.getElementById("restriction-warning-container").style.display = "block";
+                        document.getElementById("violated-restriction").innerText = monthLimitViolation + " for " + monthName[date.getMonth()] + " " + date.getFullYear();
+                        return false;
+                    }
                     var quarter = getQuarter(date);
                     if (getQuarterEvents(quarter, yearEvents) >= workerRestrictions.MaxPerQuarter) {    // Is quarter limit reached
+                        document.getElementById("restriction-warning-container").style.display = "block";
+                        document.getElementById("violated-restriction").innerText = date.getFullYear() + " Q" + quarter + " " + quarterLimitViolation;
                         return false;
                     }
-                    debugger;
                     if (yearEvents.length >= workerRestrictions.MaxPerYear) {   // Is year limit reached
+                        document.getElementById("restriction-warning-container").style.display = "block";
+                        document.getElementById("violated-restriction").innerText = date.getFullYear() + " " + yearLimitViolation;
                         return false;
                     }
+                    document.getElementById("restriction-warning-container").style.display = "none";
+                    document.getElementById("violated-restriction").innerText = "";
                     return true;
                 }
 
@@ -268,22 +297,34 @@
     <body>
         <h1>Education calendar</h1>
         <div id="calendar-container">
-            <div id="external-events">
-                <div class="external-events-header">
-                    <div class="external-event-title">
+            <div id="calendar-sidebar">
+                <div id="external-events">
+                    <div class="external-events-header">
+                        <div class="external-event-title">
+                            <p>
+                                <strong>Suggested topics</strong>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="events-list">
+                        @{
+                            var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
+                            foreach (var item in suggestedTopics)
+                            {
+                                <div class="draggable-element" eventId="@item.Id">@item.Title</div>
+                            }
+                        }
+                    </div>
+                    <div class="instructions">
                         <p>
-                            <strong>Suggested topics</strong>
+                            Create a new topic by clicking on a date
                         </p>
                     </div>
                 </div>
-                <div class="events-list">
-                    @{
-                        var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
-                        foreach (var item in suggestedTopics)
-                        {
-                            <div class="draggable-element" eventId="@item.Id">@item.Title</div>
-                        }
-                    }
+                <div id="restriction-warning-container">
+                    <strong id="restriction-warning">Restricted</strong>
+                    <p id="violated-restriction">
+                    </p>
                 </div>
             </div>
             <div id="calendar"></div>
