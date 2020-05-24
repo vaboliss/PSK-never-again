@@ -1,6 +1,7 @@
 ﻿using EducationSystem.Interfaces;
 using EducationSystem.Models;
 using EducationSystem.Data;
+using System;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -111,7 +112,23 @@ namespace EducationSystem.Provider
             }
             return Enumerable.Empty<Worker>().ToList();
         }
+        public int CreateWorkerRId(Worker worker)
+        {
+            _edu.Workers.Add(worker);
+            _edu.SaveChanges();
+            return worker.Id;
+        }
+        public void RemoveWorkerById(int id)
+        {
+            var databaseResult = _edu.Workers.Where(w => w.Id == id);
 
+            if (databaseResult.Any())
+            {
+                _edu.Workers.Remove(databaseResult.First());
+                _edu.SaveChanges();
+            }
+            throw new Exception("Worker doesn't exist");
+        }
         public bool AssignWorkers(int managerId, int workerId)
         {
             //var manager = _edu.Workers.Find(managerId);
@@ -130,7 +147,5 @@ namespace EducationSystem.Provider
             _edu.SaveChanges();
             return true;
         }
-
-
     }
 }

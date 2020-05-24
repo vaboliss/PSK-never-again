@@ -1,0 +1,37 @@
+﻿@page
+@model UsernameModel
+@{
+    ViewData["Title"] = "Manage Username";
+    ViewData["ActivePage"] = ManageNavPages.Username;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="row">
+    <div class="col-md-3">
+        <partial name="_ManageNav" />
+    </div>
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-6">
+        <form id="email-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Username"></label>
+                <input asp-for="Username" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Username"></label>
+                <input asp-for="Input.Username" class="form-control" />
+                <span asp-validation-for="Input.Username" class="text-danger"></span>
+            </div>
+            <button id="change-username-button" type="submit" asp-page-handler="ChangeUsername" class="btn btn-primary">Change Username</button>
+        </form>
+    </div>
+    <div class="col-md-2">
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
