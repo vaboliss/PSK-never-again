@@ -17,7 +17,7 @@
 {
     <p>
         @Html.Hidden("EmptySearch", 0)
-        Find by name: @Html.TextBox("SearchString",ViewBag.CurrentFilter as string)
+        Find by name: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
         <input type="submit" value="Search" />
     </p>
 }
@@ -45,7 +45,7 @@
 
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Description)
+                        @Truncate(item.Description)
                     </td>
                     <td>
                         <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
@@ -69,3 +69,21 @@ Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.Page
         LiElementClasses = new string[] { "page-item" },
         PageClasses = new string[] { "page-link" }
     })
+@functions{
+    // This will safely trim your string (regardless if it is null or not)
+    public string Truncate(string yourString)
+    {
+        // If the string isn't null or empty
+        if (!String.IsNullOrEmpty(yourString))
+        {
+            // Return the appropriate string size
+            return (yourString.Length <= 50) ? yourString : yourString.Substring(0, 50) + "...";
+        }
+        else
+        {
+            // Otherwise return the empty string
+            return "";
+        }
+    }
+
+}

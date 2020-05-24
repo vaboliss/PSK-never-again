@@ -4,65 +4,84 @@
     ViewData["Title"] = "Details";
 }
 
-<div>
-    <h4>Topic</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
     <div>
-        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-        <a href="javascript:history.back()">Back to List</a>
-    </div>
+        <h4>Topic</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd class="col-sm-10">
+                <span style="white-space:pre-line">@Html.DisplayFor(model => model.Description)</span>
+            </dd>
+        </dl>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+            <a href="javascript:history.back()">Back</a>
+        </div>
 
-    <p>
-        <a asp-action="Create" asp-route-id=@Model.Id>Create New</a>
-    </p>
+        <p>
+            <a asp-action="Create" asp-route-id=@Model.Id>Create New</a>
+        </p>
 
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Description)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.SubTopics)
-            {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>
-                        @Html.DisplayFor(model => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(model => item.Description)
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                        <a asp-action="Workers" asp-route-id="@item.Id">Workers</a>
-                    </td>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Description)
+                    </th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.SubTopics)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(model => item.Name)
+                        </td>
+                        <td>
+                            @Truncate(item.Description)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            <a asp-action="Workers" asp-route-id="@item.Id">Workers</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 <div>
 </div>
+
+@functions{
+    // This will safely trim your string (regardless if it is null or not)
+    public string Truncate(string yourString)
+    {
+        // If the string isn't null or empty
+        if (!String.IsNullOrEmpty(yourString))
+        {
+            // Return the appropriate string size
+            return (yourString.Length <= 50) ? yourString : yourString.Substring(0, 50) + "...";
+        }
+        else
+        {
+            // Otherwise return the empty string
+            return "";
+        }
+    }
+
+}
