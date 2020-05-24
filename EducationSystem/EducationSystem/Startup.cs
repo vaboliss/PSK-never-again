@@ -3,7 +3,6 @@ using EducationSystem.Data;
 using EducationSystem.Interfaces;
 using EducationSystem.Models;
 using EducationSystem.Provider;
-using Infrastructure.Provider;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
