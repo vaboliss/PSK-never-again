@@ -7,6 +7,9 @@ using EducationSystem.Models;
 using EducationSystem.Interfaces;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using X.PagedList;
+using System.ComponentModel.DataAnnotations;
 
 namespace EducationSystem.Controllers
 {
@@ -22,9 +25,42 @@ namespace EducationSystem.Controllers
         }
 
         // GET: Topics
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult> Index(string sortOrder,int? emptySearch,string searchString, string currentFilter, int? page)
         {
-            return View(await _context.Topics.ToListAsync());
+
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.CurrentSort = sortOrder;
+            if (searchString!=null||emptySearch==default(int))
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+
+            ViewBag.CurrentFilter = searchString;
+            var topics = await _topicService.GetAllTopics();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                topics = topics.Where(s => s.Name.Contains(searchString)).ToList();
+            }
+
+            switch (sortOrder) {
+                case "name_desc":
+                    topics = topics.OrderByDescending(s => s.Name).ToList();
+                    break;
+                default:
+                    topics = topics.OrderBy(s => s.Name).ToList();
+                    break;
+            }
+
+            int pageSize = 5;
+            int pageNumber = (page ?? 1);
+
+            return View(topics.ToPagedList(pageNumber,pageSize));
         }
 
         // GET: Topics/Details/5

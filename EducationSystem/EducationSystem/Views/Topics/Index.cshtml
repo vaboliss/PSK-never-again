@@ -1,4 +1,8 @@
-﻿@model IEnumerable<EducationSystem.Models.Topic>
+﻿@model IPagedList<EducationSystem.Models.Topic>
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList;
+@using X.PagedList.Mvc.Common;
 
 @{
     ViewData["Title"] = "Index";
@@ -9,14 +13,23 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+@using (Html.BeginForm())
+{
+    <p>
+        @Html.Hidden("EmptySearch", 0)
+        Find by name: @Html.TextBox("SearchString",ViewBag.CurrentFilter as string)
+        <input type="submit" value="Search" />
+    </p>
+}
+@ViewBag.CurrentFilter
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm, currentFilter = ViewBag.CurrentFilter })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.First().Description)
             </th>
             <th></th>
         </tr>
@@ -26,24 +39,33 @@
         {
             if (item.Parent == null)
             {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
 
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    <a asp-action="Workers" asp-route-id="@item.Id">Workers</a>
-                </td>
-            </tr>
-            <tr>
-            </tr>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        <a asp-action="Workers" asp-route-id="@item.Id">Workers</a>
+                    </td>
+                </tr>
+                <tr>
+                </tr>
             }
         }
     </tbody>
 </table>
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager((IPagedList)Model, page => Url.Action("Index",
+    new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }), new PagedListRenderOptions
+    {
+        LiElementClasses = new string[] { "page-item" },
+        PageClasses = new string[] { "page-link" }
+    })
