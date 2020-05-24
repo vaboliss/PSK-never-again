@@ -1,20 +1,29 @@
-﻿body {
+﻿#calendar-container {
 }
 
 #external-events {
-    position: fixed;
-    z-index: 10;
-    top: 20px;
-    left: 20px;
+    position: absolute;
+    top: 20%;
+    left: 5%;
     width: 200px;
+    height: 350px;
     padding: 0 10px;
     border: 1px solid #ccc;
     background: #eee;
+    color: #fff;
+    border-radius: 2px;
+    font-size: 14px;
 }
 
-p {
+.events-list {
+    height: 300px;
+    overflow: auto;
+}
+
+.external-event-title > p {
+    color: #212529;
     text-align: center;
-    font-size: 1vw;
+    font-size: larger;
 }
 
 .draggable-element {
@@ -26,4 +35,8 @@ p {
 
 .no-close .ui-dialog-titlebar-close {
     display: none;
+}
+
+.fc-day-grid-event > .fc-title {
+    color: white;
 }

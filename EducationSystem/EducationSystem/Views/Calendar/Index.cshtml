@@ -95,28 +95,28 @@
                     eventAllow: function (dropInfo, draggedEvent) { // Handles checking if event can be dropped on date
                         return dateAllowed(dropInfo.start);
                     }/*,
-                    eventMouseEnter: function (info) {
-                        var tooltip = '<div class="tooltip">';
-                        tooltip += '<h2>' + info.event.title + '</h2>';
-                        $(tooltip).appendTo('body');
-                        showTooltip(info);
-                    },
-                    eventMouseLeave: function (info) {
-                        hideTooltip(info);
-                    },
-                    eventClick: function (info) {
-                        info.el.style.borderColor = 'red';
-                        debugger;
-                        var tooltip = info.el.tooltip({
-                            content: info.event.title,
-                            track: true
-                        });
-                        var tooltipElement = document.getElementById('event-tooltip');
+                            eventMouseEnter: function (info) {
+                                var tooltip = '<div class="tooltip">';
+                                tooltip += '<h2>' + info.event.title + '</h2>';
+                                $(tooltip).appendTo('body');
+                                showTooltip(info);
+                            },
+                            eventMouseLeave: function (info) {
+                                hideTooltip(info);
+                            },
+                            eventClick: function (info) {
+                                info.el.style.borderColor = 'red';
+                                debugger;
+                                var tooltip = info.el.tooltip({
+                                    content: info.event.title,
+                                    track: true
+                                });
+                                var tooltipElement = document.getElementById('event-tooltip');
 
-                        debugger;
-                        info.el.appendChild(tooltipElement);
-                        tooltip.tooltip('toggle');
-                    }*/
+                                debugger;
+                                info.el.appendChild(tooltipElement);
+                                tooltip.tooltip('toggle');
+                            }*/
                 });
 
                 function validateForm() {
@@ -266,21 +266,28 @@
     </head>
 
     <body>
-
         <h1>Education calendar</h1>
-        <div id="external-events">
-            <p>
-                <strong>Suggested topics (goals)</strong>
-            </p>
-            @{
-                var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
-                foreach (var item in suggestedTopics)
-                {
-                    <div class="draggable-element" eventId="@item.Id">@item.Title</div>
-                }
-            }
+        <div id="calendar-container">
+            <div id="external-events">
+                <div class="external-events-header">
+                    <div class="external-event-title">
+                        <p>
+                            <strong>Suggested topics</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="events-list">
+                    @{
+                        var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
+                        foreach (var item in suggestedTopics)
+                        {
+                            <div class="draggable-element" eventId="@item.Id">@item.Title</div>
+                        }
+                    }
+                </div>
+            </div>
+            <div id="calendar"></div>
         </div>
-        <div id="calendar"></div>
         <div id="create-topic-dialog" title="Create new topic">
             <form name="topicForm">
                 <fieldset>
