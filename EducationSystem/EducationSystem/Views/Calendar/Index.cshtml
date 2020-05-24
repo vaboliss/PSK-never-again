@@ -3,7 +3,11 @@
 }
     <head>
         <meta charset='utf-8' />
-
+        <style>
+            .fc-event {
+                color: white !important;
+            }
+        </style>
         <link href='~/fullcalendar/packages/core/main.css' rel='stylesheet' />
         <link href='~/fullcalendar/packages/daygrid/main.css' rel='stylesheet' />
         <link href='~/css/CalendarView.css' rel='stylesheet' />
@@ -284,12 +288,22 @@
                         document.getElementById("violated-restriction").innerText = date.getFullYear() + " " + yearLimitViolation;
                         return false;
                     }
-                    document.getElementById("restriction-warning-container").style.display = "none";
-                    document.getElementById("violated-restriction").innerText = "";
+                    hideRestriction();
                     return true;
                 }
 
+                document.getElementById('calendar').addEventListener('mouseleave', e => {
+                    document.getElementById("restriction-warning-container").style.display = "none";
+                    document.getElementById("violated-restriction").innerText = "";
+                });
+
+                function hideRestriction() {
+                    document.getElementById("restriction-warning-container").style.display = "none";
+                    document.getElementById("violated-restriction").innerText = "";
+                }
+
                 calendar.render();
+
             });
         </script>
     </head>

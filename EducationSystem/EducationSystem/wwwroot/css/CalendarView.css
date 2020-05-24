@@ -37,9 +37,6 @@
     font-size: 14px;
 }
 
-#violated-restriction {
-}
-
 .events-list {
     height: 300px;
     overflow: auto;
@@ -63,6 +60,6 @@
     display: none;
 }
 
-.fc-day-grid-event > .fc-title {
-    color: white;
+.fc-event {
+    color: white !important;
 }
