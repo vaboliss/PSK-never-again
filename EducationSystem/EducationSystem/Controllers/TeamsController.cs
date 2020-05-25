@@ -11,6 +11,7 @@ using EducationSystem.Provider;
 using EducationSystem.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Data.Entity.Infrastructure;
+using System.Data;
 
 namespace EducationSystem.Controllers
 {
@@ -146,7 +147,7 @@ namespace EducationSystem.Controllers
                 return View(deletedTeam);
             }
 
-            if (teamToUpdate.Manager.Subordinates.Count() != 0)
+            if (teamToUpdate.Manager.Subordinates.Any())
             {
                 ModelState.AddModelError("", "You can't change team manager which has workers");
                 ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", teamToUpdate.WorkerId);
@@ -205,7 +206,7 @@ namespace EducationSystem.Controllers
         }
 
         // GET: Teams/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool? concurrencyError)
         {
             if (id == null)
             {
@@ -217,7 +218,20 @@ namespace EducationSystem.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (team == null)
             {
+                if (concurrencyError.GetValueOrDefault())
+                {
+                    return RedirectToAction("Index");
+                }
                 return NotFound();
+            }
+            if (concurrencyError.GetValueOrDefault())
+            {
+                ViewBag.ConcurrencyErrorMessage = "The record you attempted to delete "
+                    + "was modified by another user after you got the original values. "
+                    + "The delete operation was canceled and the current values in the "
+                    + "database have been displayed. If you still want to delete this "
+                    + "record, click the Delete button again. Otherwise "
+                    + "click the Back to List hyperlink.";
             }
             return View(team);
         }
@@ -225,18 +239,37 @@ namespace EducationSystem.Controllers
         // POST: Teams/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(Team team)
         {
-            var team = await _context.Teams.Include(t => t.Manager).Include(t => t.Manager.Subordinates)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (team.Manager.Subordinates.Count() != 0)
+             
+            try
             {
-                ModelState.AddModelError("", "You can't delete a team which has workers");
+                var teamToDelete =  _context.Teams.Include(t => t.Manager).Include(t => t.Manager.Subordinates)
+                 .FirstOrDefault(m => m.Id == team.Id);
+                if (teamToDelete == null)
+                {
+                    return RedirectToAction("Index");
+                }
+                if (teamToDelete.Manager.Subordinates.Any())
+                {
+                    ModelState.AddModelError("", "You can't delete a team which has workers");
+                    return View(teamToDelete);
+                }
+                _context.Entry(teamToDelete).State = EntityState.Detached;
+                _context.Attach(team);
+                _context.Entry(team).State = EntityState.Deleted;
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)
+            {
+                return RedirectToAction("Delete", new { concurrencyError = true, id = team.Id });
+            }
+            catch (DataException )
+            {
+                ModelState.AddModelError(string.Empty, "Unable to delete. Try again, and if the problem persists contact your system administrator.");
                 return View(team);
             }
-            _context.Teams.Remove(team);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost, ActionName("AssignWorker")]
