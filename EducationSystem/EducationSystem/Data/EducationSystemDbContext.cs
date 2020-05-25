@@ -1,11 +1,15 @@
 ﻿using EducationSystem.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace EducationSystem.Data
 {
-    public class EducationSystemDbContext : DbContext
+    public class EducationSystemDbContext : IdentityDbContext<ApplicationUser>
     {
-        public EducationSystemDbContext(DbContextOptions options) : base(options) { }
+        public EducationSystemDbContext(DbContextOptions options) : base(options)
+        {
+        }
 
         public DbSet<Topic> Topics { get; set; }
         public DbSet<LearningDay> LearningDays { get; set; }
@@ -17,8 +21,16 @@ namespace EducationSystem.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<WorkerTopic>().HasKey(wt => new { wt.WorkerId, wt.TopicId});
-            modelBuilder.Entity<Topic>().HasMany(t => t.SubTopics).WithOne(t => t.Parent);
+            modelBuilder.Entity<Topic>();
+            modelBuilder.Entity<Team>();
+            modelBuilder.Entity<Goal>();
+            modelBuilder.Entity<Worker>();
+            modelBuilder.Entity<LearningDay>();
+            modelBuilder.Entity<Restriction>();
+            modelBuilder.Entity<WorkerTopic>().HasKey(wt => new { wt.WorkerId, wt.TopicId });
+            modelBuilder.Entity<ApplicationUser>().HasIndex(wt => wt.WorkerId).IsUnique();
+            base.OnModelCreating(modelBuilder);
+
         }
     }
 }

@@ -1,0 +1,55 @@
+﻿@{
+    var message = TempData["Message"] ?? string.Empty;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EducationSystem</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/CreateNew.css" />
+</head>
+<body>
+    <div class="container">
+        <script type="text/javascript">
+            var message = '@message';
+            if (message)
+                alert(message);
+        </script>
+        <div class="row mx-auto">
+            <div class="col-lg-6 col-sm-6 my-5">
+                <div class="my-5">
+                    <p class="font-weight-bold">Instructions</p>
+                    <p class="font-italic">1. Enter new user's first name and last name</p>
+                    <p class="font-italic">2. Press Create & Send Email button</p>
+                    <p class="font-italic">3. The user will be created and credentials will be sent in provided email</p>
+                    <p class="font-italic">4. The new user will be able to change his password later</p>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-6 my-5">
+                <div class="card card-signin my-5">
+                    <div class="card-body ">
+                        <h5 class="card-title text-center">Create New User</h5>
+                        <form class="form-signin" action="/Account/CreateNew" method="post">
+                            <div class="form-label-group">
+                                <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" required autofocus autocomplete="off">
+                            </div>
+                            <div class="form-label-group">
+                                <input type="text" id="inputUsername" name="username" class="form-control" placeholder="Username" required autofocus autocomplete="off">
+                            </div>
+                            <div class="form-label-group">
+                                <input type="text" id="InputFirstName" name="firstName" class="form-control" placeholder="First Name" required autofocus autocomplete="off">
+                            </div>
+                            <div class="form-label-group">
+                                <input type="text" id="InputLastName" name="lastName" class="form-control" placeholder="Last Name" required autofocus autocomplete="off">
+                            </div>
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Create & Send email</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
