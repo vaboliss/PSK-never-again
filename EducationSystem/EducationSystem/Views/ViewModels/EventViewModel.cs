@@ -9,5 +9,6 @@ namespace EducationSystem.Views.ViewModels
         public DateTime Start { get; set; }
         public string TopicName { get; set; }
         public string TopicDescription { get; set; }
+        public string Comments { get; set; }
     }
 }

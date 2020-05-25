@@ -121,5 +121,59 @@ namespace EducationSystem.Controllers
             }
             return View(Index());
         }
+
+        // Returns specified day info
+        [HttpPost]
+        public IActionResult GetDayInfo([FromBody] EventViewModel eventModel)
+        {
+            if (ModelState.IsValid)
+            {
+                Worker worker = _context.Find<Worker>(1);
+                if (worker == null)
+                {
+                    return NotFound();
+                }
+                var learningDays = _context.LearningDays.Where(ld => ld.Date == eventModel.Start && ld.Topic.Name == eventModel.TopicName).Include(ld => ld.Topic).ToList();
+                if (!learningDays.Any())
+                {
+                    return NotFound();
+                }
+                var learningDay = learningDays.First();
+
+                EventViewModel dayInfo = new EventViewModel();
+                dayInfo.Title = worker.FirstName + " " + worker.LastName;
+                dayInfo.TopicName = learningDay.Topic.Name;
+                dayInfo.Comments = learningDay.Comment;
+                dayInfo.Id = learningDay.Id;
+
+                var jsonData = JsonSerializer.Serialize(dayInfo);
+                return Json(jsonData);
+            }
+            return NotFound();
+        }
+
+        // Updates learning day entity with changes made to comments
+        [HttpPut]
+        public IActionResult UpdateComments([FromBody] EventViewModel eventModel)
+        {
+            if (ModelState.IsValid)
+            {
+                Worker worker = _context.Find<Worker>(1);
+                if (worker == null)
+                {
+                    return NotFound();
+                }
+                LearningDay learningDay = _context.Find<LearningDay>(eventModel.Id);
+                if (learningDay == null)
+                {
+                    return NotFound();
+                }
+                learningDay.Comment = eventModel.Comments;
+                _context.SaveChanges();
+                var jsonData = JsonSerializer.Serialize(eventModel);
+                return Json(jsonData);
+            }
+            return NotFound();
+        }
     }
 }

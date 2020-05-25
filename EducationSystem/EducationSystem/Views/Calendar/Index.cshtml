@@ -39,6 +39,7 @@
                 var calendarEl = document.getElementById('calendar');
                 var draggableEl = document.getElementById('external-events');
                 var clickedDate;
+                var selectedDayId;
                 var workerRestrictions;
 
                 $.get("/Calendar/GetWorkerRestrictions", function (data, status) {
@@ -56,7 +57,7 @@
                 });
 
                 var calendar = new Calendar(calendarEl, {
-                    plugins: ['interaction', 'dayGrid', 'moment'],
+                    plugins: ['interaction', 'dayGrid'],
                     events:
                     {
                         url: '/Calendar/GetLearningDays',
@@ -102,31 +103,27 @@
                             clickedDate = info.date;
                         }
                     },
-                    eventAllow: function (dropInfo, draggedEvent) { // Handles checking if event can be dropped on date
+                    eventAllow: function (dropInfo) { // Handles checking if event can be dropped on date
                         return dateAllowed(dropInfo.start);
-                    }/*,
-                            eventMouseEnter: function (info) {
-                                var tooltip = '<div class="tooltip">';
-                                tooltip += '<h2>' + info.event.title + '</h2>';
-                                $(tooltip).appendTo('body');
-                                showTooltip(info);
-                            },
-                            eventMouseLeave: function (info) {
-                                hideTooltip(info);
-                            },
-                            eventClick: function (info) {
-                                info.el.style.borderColor = 'red';
-                                debugger;
-                                var tooltip = info.el.tooltip({
-                                    content: info.event.title,
-                                    track: true
-                                });
-                                var tooltipElement = document.getElementById('event-tooltip');
-
-                                debugger;
-                                info.el.appendChild(tooltipElement);
-                                tooltip.tooltip('toggle');
-                            }*/
+                    },
+                    eventClick: function (info) {
+                        showDayInfo();
+                        var data0 = { TopicName: info.event.title, Start: info.event.start };
+                        var json = JSON.stringify(data0);
+                        $.ajax({
+                            type: "POST",
+                            url: '/Calendar/GetDayInfo',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            data: json,
+                            success: function (data, responseText) {
+                                dayInfo = JSON.parse(data);
+                                displayDayInfo(dayInfo);
+                                selectedDayId = dayInfo.Id;
+                                return;
+                            }
+                        });
+                    }
                 });
 
                 function validateForm() {
@@ -292,6 +289,52 @@
                     return true;
                 }
 
+                function hideDayInfo() {
+                    clearDayInfo();
+                    document.getElementById("calendar-sidebar-right").style.display = "none";
+                }
+
+                document.getElementById("hide-day-info-button").onclick = hideDayInfo;
+                document.getElementById("update-comments-button").onclick = updateDayComments;
+
+                // PUT request for updating day comments
+                function updateDayComments() {
+                    var comments = document.getElementById("info-comments").value;
+                    if (comments == "")
+                        return;
+                    var data0 = { Comments: comments, Id: selectedDayId };
+                    var json = JSON.stringify(data0);
+                    $.ajax({
+                        type: "PUT",
+                        url: '/Calendar/UpdateComments',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: json,
+                        success: function () {
+                            hideDayInfo();
+                            calendar.refetchEvents();
+                            return;
+                        }
+                    });
+                }
+
+                function showDayInfo() {
+                    document.getElementById("calendar-sidebar-right").style.display = "block";
+                }
+
+                function displayDayInfo(dayInfo) {
+                    document.getElementById("calendar-sidebar-right").style.display = "block";
+                    document.getElementById("info-topic-name").innerText = dayInfo.TopicName;
+                    document.getElementById("info-employee").innerText = dayInfo.Title;
+                    document.getElementById("info-comments").value = dayInfo.Comments;
+                }
+
+                function clearDayInfo() {
+                    document.getElementById("info-topic-name").innerText = "";
+                    document.getElementById("info-employee").innerText = "";
+                    document.getElementById("info-comments").value = "";
+                }
+
                 document.getElementById('calendar').addEventListener('mouseleave', e => {
                     document.getElementById("restriction-warning-container").style.display = "none";
                     document.getElementById("violated-restriction").innerText = "";
@@ -342,6 +385,29 @@
                 </div>
             </div>
             <div id="calendar"></div>
+            <div id="calendar-sidebar-right">
+                <div id="day-info">
+                    <button id="hide-day-info-button" type="button" class="close" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="day-info-header">
+                        <div class="day-info-title">
+                            <p>
+                                <strong>Day information</strong>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="day-info-text">
+                        <strong>Employee</strong>
+                        <p id="info-employee"></p>
+                        <strong>Topic</strong>
+                        <p id="info-topic-name"></p>
+                        <strong>Comments</strong>
+                        <textarea id="info-comments" placeholder="Additional comments"></textarea>
+                        <button id="update-comments-button" type="button" class="btn btn-primary update-comments-button">Update</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="create-topic-dialog" title="Create new topic">
             <form name="topicForm">
