@@ -39,6 +39,62 @@ namespace EducationSystem.Provider
             _edu.SaveChanges();
             return true;
         }
+        public bool AssingLearned(Worker worker,Topic topic)
+        {
+            if (topic is null||worker is null)
+                return false;
+
+            WorkerTopic workerTopic = new WorkerTopic();
+            workerTopic.Worker = worker;
+            workerTopic.Topic = topic;
+            if (_edu.WorkerTopics.Any(o => o.Topic == workerTopic.Topic && o.Worker == workerTopic.Worker)){
+                return false;
+            }
+            try
+            {
+                _edu.WorkerTopics.Add(workerTopic);
+            }
+            catch
+            {
+                return false;
+            }
+            _edu.SaveChanges();
+            return true;
+        }
+        public bool RemoveLearned(Worker worker, Topic topic)
+        {
+            if (topic is null || worker is null)
+                return false;
+
+            WorkerTopic workerTopic = new WorkerTopic();
+            workerTopic.Worker = worker;
+            workerTopic.Topic = topic;
+            if (_edu.WorkerTopics.Any(o => o.Topic == workerTopic.Topic && o.Worker == workerTopic.Worker))
+            {
+                try
+                {
+                    _edu.WorkerTopics.Remove(workerTopic);
+                }
+                catch
+                {
+                    return false;
+                }
+
+                _edu.SaveChanges();
+            }
+            return true;
+        }
+
+
+
+        //WorkerTopic
+        public List<Topic> GetWorkersTopics(Worker worker)
+        {
+            var topicList = _edu.WorkerTopics.Where(g => g.Worker == worker).Select(g => g.Topic).ToList();
+            return topicList;
+        }
+
+
 
         // Returns a list of topics that are assigned as goals to the particular worker
         public List<Topic> GetWorkerGoalsAsTopics (Worker worker)
@@ -147,5 +203,6 @@ namespace EducationSystem.Provider
             _edu.SaveChanges();
             return true;
         }
+
     }
 }

@@ -10,18 +10,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using X.PagedList;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace EducationSystem.Controllers
 {
     public class TopicsController : Controller
     {
-        private readonly EducationSystemDbContext _context;
 
+        private readonly EducationSystemDbContext _context;
         private readonly ITopic _topicService;
-        public TopicsController(EducationSystemDbContext context, ITopic topicService)
+        private readonly IWorker _workerService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        public TopicsController(EducationSystemDbContext context, ITopic topicService, IWorker workerService,UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _topicService = topicService;
+            _userManager = userManager;
+            _workerService = workerService;
         }
 
         // GET: Topics
@@ -42,30 +47,82 @@ namespace EducationSystem.Controllers
 
             ViewBag.CurrentFilter = searchString;
             var topics = await _topicService.GetAllTopics();
+            var username = HttpContext.User.Identity.Name;
+            var user =  await _userManager.FindByNameAsync(username);
+            var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
+            var workerTopic = _workerService.GetWorkersTopics(worker);
+            var modelTopics = MapTopicList(topics,workerTopic);
+
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                topics = topics.Where(s => s.Name.Contains(searchString)).ToList();
+                modelTopics = modelTopics.Where(s => s.Name.Contains(searchString)).ToList();
             }
 
             switch (sortOrder) {
                 case "name_desc":
-                    topics = topics.OrderByDescending(s => s.Name).ToList();
+                    modelTopics = modelTopics.OrderByDescending(s => s.Name).ToList();
                     break;
                 default:
-                    topics = topics.OrderBy(s => s.Name).ToList();
+                    modelTopics = modelTopics.OrderBy(s => s.Name).ToList();
                     break;
             }
 
             int pageSize = 5;
             int pageNumber = (page ?? 1);
 
-            return View(topics.ToPagedList(pageNumber,pageSize));
+            return View(modelTopics.ToPagedList(pageNumber,pageSize));
         }
+
+        public List<TopicModel> MapTopicList(List<Topic> topics,List<Topic> workerTopics)
+        {
+            Console.WriteLine(workerTopics.Count);
+            List<TopicModel> topicModelList = new List<TopicModel>();
+            foreach (var topic in topics)
+            {
+                TopicModel tempModel = new TopicModel();
+                if (workerTopics.Contains(topic))
+                {
+                    tempModel.Learned = true;
+
+                }
+                else {
+                    tempModel.Learned = false;
+                }
+                tempModel.Description = topic.Description;
+                tempModel.Id = topic.Id;
+                tempModel.Name = topic.Name;
+                topicModelList.Add(tempModel);
+
+            }
+
+
+            return topicModelList;
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index(int topicId,bool learned) {
+
+            Console.WriteLine("Test");
+            var topic  = _topicService.GetTopicById(topicId);
+            var username = HttpContext.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(username);
+            var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
+            if (!learned)
+            {
+                _workerService.AssingLearned(worker, topic);
+            }
+            else {
+                _workerService.RemoveLearned(worker, topic);
+            }
+            return Redirect($"{Request.Path.ToString()}{Request.QueryString.Value.ToString()}");
+        }
+
 
         // GET: Topics/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            Console.WriteLine(id);
             if (id == null)
             {
                 return NotFound();
@@ -73,6 +130,7 @@ namespace EducationSystem.Controllers
 
             var topic = await _context.Topics.Include(m=>m.SubTopics)
                 .FirstOrDefaultAsync(m => m.Id == id);
+            ViewBag.topic = topic;
             if (topic == null)
             {
                 return NotFound();

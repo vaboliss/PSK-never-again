@@ -1,4 +1,4 @@
-﻿@model IPagedList<EducationSystem.Models.Topic>
+﻿@model IPagedList<EducationSystem.Models.TopicModel>
 
 @using X.PagedList.Mvc.Core;
 @using X.PagedList;
@@ -15,16 +15,18 @@
 </p>
 @using (Html.BeginForm())
 {
-    <p>
-        @Html.Hidden("EmptySearch", 0)
-        Find by name: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
-        <input type="submit" value="Search" />
-    </p>
+<p>
+    @Html.Hidden("SortOrder", (object)ViewBag.NameSortParm)
+    @Html.Hidden("EmptySearch", 0)
+    Find by name: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+    <input type="submit" value="Search" />
+</p>
 }
 @ViewBag.CurrentFilter
 <table class="table">
     <thead>
-        <tr>
+        <tr><th>
+            </th>
             <th>
                 @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm, currentFilter = ViewBag.CurrentFilter })
             </th>
@@ -37,9 +39,11 @@
     <tbody>
         @foreach (var item in Model)
         {
-            if (item.Parent == null)
-            {
-                <tr>
+                <tr><td>
+                    @if(item.Learned==true){
+                        <p>&#9734;</p>
+                        }
+                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)
 
@@ -51,12 +55,25 @@
                         <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                        <a asp-action="Workers" asp-route-id="@item.Id">Workers</a>
+
+                        @using (Html.BeginForm(FormMethod.Post))
+                        {
+                            @Html.Hidden("topicId", item.Id);
+                            @Html.Hidden("learned", item.Learned);
+                            @if (item.Learned == false)
+                            {
+                                <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Learn" />
+                            }
+                            else
+                            {
+                                <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Unlearn" />
+                            }
+                        }
+
                     </td>
                 </tr>
                 <tr>
                 </tr>
-            }
         }
     </tbody>
 </table>
