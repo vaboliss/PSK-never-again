@@ -186,5 +186,25 @@ namespace EducationSystem.Controllers
             }
             return NotFound();
         }
+
+        // Delete learning day entity
+        [HttpDelete]
+        public async Task<IActionResult> DeleteLearningDay([FromBody] EventViewModel eventModel)
+        {
+            if (ModelState.IsValid)
+            {
+                currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+                LearningDay learningDay = _context.Find<LearningDay>(eventModel.Id);
+                if (learningDay == null)
+                {
+                    return NotFound();
+                }
+                _context.Remove(learningDay);
+                _context.SaveChanges();
+                var jsonData = JsonSerializer.Serialize(eventModel);
+                return Json(jsonData);
+            }
+            return NotFound();
+        }
     }
 }

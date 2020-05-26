@@ -296,6 +296,25 @@
 
                 document.getElementById("hide-day-info-button").onclick = hideDayInfo;
                 document.getElementById("update-comments-button").onclick = updateDayComments;
+                document.getElementById("delete-event-button").onclick = deleteEvent;
+
+                // DELETE request for deleting learning days
+                function deleteEvent() {
+                    var data0 = { Id: selectedDayId };
+                    var json = JSON.stringify(data0);
+                    $.ajax({
+                        type: "DELETE",
+                        url: '/Calendar/DeleteLearningDay',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: json,
+                        success: function () {
+                            hideDayInfo();
+                            calendar.refetchEvents();
+                            return;
+                        }
+                    });
+                }
 
                 // PUT request for updating day comments
                 function updateDayComments() {
@@ -327,6 +346,7 @@
                     document.getElementById("info-topic-name").innerText = dayInfo.TopicName;
                     document.getElementById("info-employee").innerText = dayInfo.Title;
                     document.getElementById("info-comments").value = dayInfo.Comments;
+
                 }
 
                 function clearDayInfo() {
@@ -404,7 +424,10 @@
                         <p id="info-topic-name"></p>
                         <strong>Comments</strong>
                         <textarea id="info-comments" placeholder="Additional comments"></textarea>
-                        <button id="update-comments-button" type="button" class="btn btn-primary update-comments-button">Update</button>
+                        <div class="info-buttons">
+                            <button id="update-comments-button" type="button" class="btn btn-primary update-comments-button">Update</button>
+                            <button id="delete-event-button" type="button" class="btn btn-primary delete-event-button">Delete</button>
+                        </div>
                     </div>
                 </div>
             </div>

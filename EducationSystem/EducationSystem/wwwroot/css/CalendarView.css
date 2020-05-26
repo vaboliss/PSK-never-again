@@ -76,16 +76,30 @@
  .fc-event-container {
      cursor: pointer;
 }
- .btn-primary {
-     background: #2c3e50;
+.update-comments-button:hover {
+    background: #1e2b37;
 }
- .btn-primary:hover {
-     background: #1e2b37;
+.update-comments-button {
+    display: flex;
+    float: left;
+    background: #2c3e50;
+    margin-left: 0;
+    margin-right: auto;
 }
- .update-comments-button {
-     margin: 1em 3em;
+.delete-event-button {
+    display: flex;
+    float: right;
+    background: #9a0000;
+    margin-left: auto;
+    margin-right: 0;
 }
- #info-comments {
-     width: 100%;
+.delete-event-button:hover {
+    background: #5f0000;
+}
+.info-buttons {
+    width: 100%;
+}
+#info-comments {
+    width: 100%;
 }
  
