@@ -105,7 +105,6 @@
                         }
                     },
                     eventAllow: function (dropInfo) { // Handles checking if event can be dropped on date (only if DraggableEl has eventData Create:true)
-                        debugger;
                         return dateAllowed(dropInfo.start);
                     },
                     eventClick: function (info) {
@@ -190,7 +189,6 @@
 
                                     var data0 = { TopicName: topicName, TopicDescription: topicDescription, Start: clickedDate };
                                     var json = JSON.stringify(data0);
-                                    debugger;
                                     $.ajax({
                                         type: "POST",
                                         url: '/Calendar/CreateLearningDayAndTopic',

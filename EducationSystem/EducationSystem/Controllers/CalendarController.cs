@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using EducationSystem.Static;
+using EducationSystem.Interfaces;
 
 namespace EducationSystem.Controllers
 {
@@ -52,15 +54,25 @@ namespace EducationSystem.Controllers
 
         // Returns worker restrictions
         [HttpGet]
-        public async Task<IActionResult> GetWorkerRestrictions()        //  TO-DO: Worker Id should be equal to current logged in user Id
+        public async Task<IActionResult> GetWorkerRestrictions()
         {
+            Restriction restriction;
             currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
             var restrictions = _context.Restrictions.Where(r => r.WorkerId == currentUser.WorkerId);
-            if (!restrictions.Any())
+            if (restrictions.Any())
             {
-                return NotFound();
+                restriction = restrictions.First();
             }
-            Restriction restriction = restrictions.First();
+            else
+            {
+                restriction = new Restriction
+                {
+                    MaxConsecutiveDays = GlobalRestrictions.MaxConsecutiveDays,
+                    MaxPerMonth = GlobalRestrictions.MaxPerMonth,
+                    MaxPerQuarter = GlobalRestrictions.MaxPerQuarter,
+                    MaxPerYear = GlobalRestrictions.MaxPerYear
+                };
+            }
             var jsonData = JsonSerializer.Serialize(restriction);
             return Json(jsonData);
         }
