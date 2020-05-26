@@ -28,7 +28,7 @@ namespace EducationSystem.Provider
             return null;
         }
         public async Task<List<Topic>> GetAllTopics() { // Only topics, not subtopics
-            var topics = await _edu.Topics.Where(t=>t.Parent == null).ToListAsync();
+            var topics = await _edu.Topics.Where(t => t.Parent == null).ToListAsync();
             return topics;
         }
 
