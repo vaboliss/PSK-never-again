@@ -1,0 +1,105 @@
+﻿#calendar-container {
+     display: flex;
+     margin-left: 0px;
+     margin-right: 0px;
+}
+ .instructions {
+     color: #212529;
+}
+ #calendar-sidebar {
+     position: relative;
+     margin-right: 20px;
+}
+ #calendar-sidebar-right {
+     position: relative;
+     margin-left: 20px;
+     display: none;
+}
+ #restriction-warning-container {
+     position: relative;
+     top: 15%;
+     min-width: 150px;
+     min-height: 50px;
+     display: none;
+     padding: 0 5px;
+     border: 1px solid #ccc;
+     background: rgba(255, 0, 0, 0.20);
+}
+ #external-events{
+     position: relative;
+     top: 9%;
+     width: 200px;
+     min-height: 300px;
+     padding: 0 10px;
+     border: 1px solid #ccc;
+     background: #ededed;
+     color: #fff;
+     border-radius: 2px;
+     font-size: 14px;
+}
+ #day-info {
+     position: relative;
+     top: 9%;
+     width: 200px;
+     min-height: 300px;
+     padding: 0 10px;
+     border: 1px solid #ccc;
+     background: #ededed;
+     color: #212529;
+     border-radius: 2px;
+     font-size: 14px;
+}
+ .events-list, .day-info-text {
+     height: 300px;
+     overflow: auto;
+}
+ .day-info-text {
+     overflow-wrap: break-word;
+     word-wrap: break-word;
+     hyphens: auto;
+}
+ .external-event-title > p, .day-info-title > p {
+     color: #212529;
+     text-align: center;
+     font-size: larger;
+}
+ .draggable-element {
+     margin: 1em 0;
+     cursor: move;
+     border: 1px solid #ccc;
+     background: #3788d8;
+     overflow: hidden;
+}
+ .no-close .ui-dialog-titlebar-close {
+     display: none;
+}
+ .fc-event-container {
+     cursor: pointer;
+}
+.update-comments-button:hover {
+    background: #1e2b37;
+}
+.update-comments-button {
+    display: flex;
+    float: left;
+    background: #2c3e50;
+    margin-left: 0;
+    margin-right: auto;
+}
+.delete-event-button {
+    display: flex;
+    float: right;
+    background: #9a0000;
+    margin-left: auto;
+    margin-right: 0;
+}
+.delete-event-button:hover {
+    background: #5f0000;
+}
+.info-buttons {
+    width: 100%;
+}
+#info-comments {
+    width: 100%;
+}
+ 
