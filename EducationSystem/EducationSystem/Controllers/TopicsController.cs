@@ -166,7 +166,7 @@ namespace EducationSystem.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit( int id, [Bind("Id,Name,Description")] Topic topic)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Topic topic)
         {
             if (id != topic.Id)
             {
