@@ -90,12 +90,13 @@ namespace EducationSystem.Controllers
                 learningDay.Date = eventModel.Start;
                 _context.Add(learningDay);
                 _context.SaveChanges();
-                return View(learningDay);
+                var jsonData = JsonSerializer.Serialize(eventModel);
+                return Json(jsonData);
             }
             return View(Index());
         }
 
-        // Creates LearningDay entity from the calendar
+        // Creates LearningDay and new Topic from the calendar
         [HttpPost]
         public IActionResult CreateLearningDayAndTopic([FromBody] EventViewModel eventModel)
         {

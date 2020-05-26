@@ -51,7 +51,8 @@
                     eventData: function (eventEl) {
                         return {
                             title: eventEl.innerText,
-                            overlap: false
+                            overlap: false,
+                            create: false
                         };
                     }
                 });
@@ -80,12 +81,10 @@
                                 dataType: "json",
                                 data: json,
                                 success: function (results, responseText) {
-                                    console.log("success : " + responseText);
-                                    location.reload(true);
+                                    calendar.refetchEvents();
                                     return;
                                 },
                                 error: function (status, error) {
-                                    console.log("error : " + status + error);
                                     info.revert();
                                     return;
                                 }
