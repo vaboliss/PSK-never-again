@@ -69,6 +69,8 @@
                     eventLimit: true,
                     displayEventTime: false,
                     drop: function (info) {
+                        if (!dateAllowed(info.date))
+                            return;
                         var eventId = info.draggedEl.getAttribute("eventId");
                         var answer = confirm("Assign new learning day on selected time slot?");
                         if (answer) {
@@ -102,7 +104,8 @@
                             clickedDate = info.date;
                         }
                     },
-                    eventAllow: function (dropInfo) { // Handles checking if event can be dropped on date
+                    eventAllow: function (dropInfo) { // Handles checking if event can be dropped on date (only if DraggableEl has eventData Create:true)
+                        debugger;
                         return dateAllowed(dropInfo.start);
                     },
                     eventClick: function (info) {
