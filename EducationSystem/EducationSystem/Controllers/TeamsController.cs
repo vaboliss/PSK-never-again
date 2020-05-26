@@ -10,20 +10,26 @@ using EducationSystem.Models;
 using EducationSystem.Provider;
 using EducationSystem.Interfaces;
 using Microsoft.AspNetCore.Http;
-using System.Data.Entity.Infrastructure;
 using System.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace EducationSystem.Controllers
 {
+    [Authorize(Roles="Manager")]
     public class TeamsController : Controller
     {
         private readonly EducationSystemDbContext _context;
         private readonly IWorker _workerService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public TeamsController(EducationSystemDbContext context, IWorker workerService)
+        public TeamsController(EducationSystemDbContext context, IWorker workerService, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _workerService = workerService;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: Teams
@@ -82,7 +88,7 @@ namespace EducationSystem.Controllers
                 var isManager = _context.Teams.Where(t=> t.WorkerId==team.WorkerId).ToList();
                 if (isManager.Any())
                 {
-                    ModelState.AddModelError("", "This person is already a manager");
+                    ModelState.AddModelError("", "This person already has a team");
                     var workers = _context.Workers.ToList();
                     IEnumerable<SelectListItem> selectList = from s in workers
                                                             select new SelectListItem
@@ -95,6 +101,16 @@ namespace EducationSystem.Controllers
                     return View(team);
                     
                 }
+                var username = HttpContext.User.Identity.Name;
+                var currentUser = await _userManager.FindByNameAsync(username);
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.WorkerId == team.WorkerId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                await _userManager.RemoveFromRoleAsync(user, "Worker");
+                await _userManager.AddToRoleAsync(user, "Manager");
+                await _signInManager.RefreshSignInAsync(currentUser);
                 _context.Add(team);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -259,6 +275,18 @@ namespace EducationSystem.Controllers
                 _context.Attach(team);
                 _context.Entry(team).State = EntityState.Deleted;
                 await _context.SaveChangesAsync();
+                var username = HttpContext.User.Identity.Name;
+                var currentUser = await _userManager.FindByNameAsync(username);
+                //var user = await _userManager.FindByIdAsync(manager.Id.ToString());
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.WorkerId == teamToDelete.WorkerId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                await _userManager.RemoveFromRoleAsync(user, "Manager");
+                await _userManager.AddToRoleAsync(user, "Worker");
+                await _signInManager.RefreshSignInAsync(currentUser);
+                
                 return RedirectToAction("Index");
             }
             catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)
@@ -291,7 +319,7 @@ namespace EducationSystem.Controllers
 
         [HttpPost, ActionName("DeleteWorker")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteWorker(int? id, int? managerId)
+        public async Task<ActionResult> DeleteWorkerAsync(int? id, int? managerId)
         {
             if (id == null || managerId == null)
             {
