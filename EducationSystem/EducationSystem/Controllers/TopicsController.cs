@@ -112,7 +112,7 @@ namespace EducationSystem.Controllers
         
         {
             Topic topicToCreate = new Topic() { Name = topic.Name, Description = topic.Description };
-            int redirect=default(int);
+            int redirect = default(int);
             if (topic.ParentId != default(int)) {
                 redirect = topic.Id;
                 }
