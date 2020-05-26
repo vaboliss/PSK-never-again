@@ -1,5 +1,4 @@
 ﻿using EducationSystem.Data;
-using EducationSystem.Interfaces;
 using EducationSystem.Models;
 using EducationSystem.Views.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -13,21 +12,18 @@ using System.Text.Json;
 
 namespace EducationSystem.Controllers
 {
-    [Authorize(Roles = "Worker")]
+    [Authorize]
     public class CalendarController : Controller
     {
         private readonly EducationSystemDbContext _context;
-
-        private readonly ILearningDay _learningDayService;
 
         private readonly UserManager<ApplicationUser> _userManager;
 
         private ApplicationUser currentUser;
 
-        public CalendarController(EducationSystemDbContext context, ILearningDay learningDayService, UserManager<ApplicationUser> userManager)
+        public CalendarController(EducationSystemDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
-            _learningDayService = learningDayService;
             _userManager = userManager;
         }
         public async Task<IActionResult> IndexAsync()
