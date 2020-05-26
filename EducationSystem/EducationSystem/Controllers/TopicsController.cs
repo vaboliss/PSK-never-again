@@ -122,6 +122,7 @@ namespace EducationSystem.Controllers
         // GET: Topics/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+
             Console.WriteLine(id);
             if (id == null)
             {
@@ -130,13 +131,43 @@ namespace EducationSystem.Controllers
 
             var topic = await _context.Topics.Include(m=>m.SubTopics)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            ViewBag.topic = topic;
+
+
             if (topic == null)
             {
                 return NotFound();
             }
+            var username = HttpContext.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(username);
+            var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
+            var workerTopic = _workerService.GetWorkersTopics(worker);
+            var modelTopics = MapTopicList(topic.SubTopics.ToList(), workerTopic);
+
+            ViewBag.subtopics = modelTopics;
+
 
             return View(topic);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Details(int topicId, bool learned)
+        {
+
+            Console.WriteLine("Test");
+            var topic = _topicService.GetTopicById(topicId);
+            var username = HttpContext.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(username);
+            var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
+            if (!learned)
+            {
+                _workerService.AssingLearned(worker, topic);
+            }
+            else
+            {
+                _workerService.RemoveLearned(worker, topic);
+            }
+            return Redirect($"{Request.Path.ToString()}{Request.QueryString.Value.ToString()}");
         }
 
         // GET: Topics/Create
