@@ -30,7 +30,7 @@ namespace EducationSystem.Controllers
 
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewBag.CurrentSort = sortOrder;
-            if (searchString!=null||emptySearch==default(int))
+            if (searchString != null || emptySearch == default(int))
             {
                 page = 1;
             }
