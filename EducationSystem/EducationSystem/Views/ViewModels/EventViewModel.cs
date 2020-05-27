@@ -10,5 +10,6 @@ namespace EducationSystem.Views.ViewModels
         public string TopicName { get; set; }
         public string TopicDescription { get; set; }
         public string Comments { get; set; }
+        public int WorkerId { get; set; }
     }
 }

@@ -34,7 +34,6 @@ namespace EducationSystem.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            await GetSuggestedTopics();
             ViewData["Subordinates"] = new SelectList(await GetManagerSubordinates(), nameof (Worker.Id), nameof(Worker.FirstName));
             return View();
         }
@@ -49,11 +48,14 @@ namespace EducationSystem.Controllers
 
         // Creates a list of learning days for the calendar to display
         [HttpGet]
-        public async Task<IActionResult> GetLearningDays()
+        public IActionResult GetLearningDays([FromQuery] int subordinateId)
         {
-            currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+            if (!ModelState.IsValid)
+            {
+                return NotFound();
+            }
             List<EventViewModel> calendarEvents = new List<EventViewModel>();
-            var learningDays = _context.LearningDays.Where(ld => ld.WorkerId == currentUser.WorkerId).Include(ld => ld.Topic).ToList(); // GetLearningDaysByWorker exists as well
+            var learningDays = _context.LearningDays.Where(ld => ld.WorkerId == subordinateId).Include(ld => ld.Topic).ToList(); // GetLearningDaysByWorker exists as well
             foreach (LearningDay day in learningDays)
             {
                 EventViewModel tempEvent = new EventViewModel();
@@ -67,11 +69,14 @@ namespace EducationSystem.Controllers
 
         // Returns worker restrictions
         [HttpGet]
-        public async Task<IActionResult> GetWorkerRestrictions()
+        public IActionResult GetWorkerRestrictions([FromQuery] int subordinateId)
         {
+            if (!ModelState.IsValid)
+            {
+                return NotFound();
+            }
             Restriction restriction;
-            currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
-            var restrictions = _context.Restrictions.Where(r => r.WorkerId == currentUser.WorkerId);
+            var restrictions = _context.Restrictions.Where(r => r.WorkerId == subordinateId);
             if (restrictions.Any())
             {
                 restriction = restrictions.First();
@@ -91,11 +96,11 @@ namespace EducationSystem.Controllers
         }
 
         // Creates a ViewBag of Suggested Topics aka Goals
-        public async Task GetSuggestedTopics()
+        [HttpGet]
+        public IActionResult GetSuggestedTopics([FromQuery] int subordinateId)
         {
-            currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
             List<EventViewModel> suggestedTopics = new List<EventViewModel>();
-            List<Goal> goals = _context.Goals.Where(ld => ld.WorkerId == currentUser.WorkerId).Include(ld => ld.Topic).ToList();
+            List<Goal> goals = _context.Goals.Where(ld => ld.WorkerId == subordinateId).Include(ld => ld.Topic).ToList();
             foreach (Goal goal in goals)
             {
                 EventViewModel tempEvent = new EventViewModel();
@@ -103,7 +108,7 @@ namespace EducationSystem.Controllers
                 tempEvent.Title = goal.Topic.Name;
                 suggestedTopics.Add(tempEvent);
             }
-            ViewData["SuggestedTopics"] = suggestedTopics;
+            return Json(suggestedTopics);
         }
 
         // Creates LearningDay entity from the calendar
@@ -118,7 +123,7 @@ namespace EducationSystem.Controllers
                 learningDay.Topic = topic;
                 learningDay.TopicId = topic.Id;
                 learningDay.Worker = _context.Find<Worker>(currentUser.WorkerId);
-                learningDay.WorkerId = currentUser.WorkerId;
+                learningDay.WorkerId = eventModel.WorkerId;
                 learningDay.Date = eventModel.Start;
                 _context.Add(learningDay);
                 _context.SaveChanges();

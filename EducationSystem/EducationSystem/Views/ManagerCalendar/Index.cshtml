@@ -38,13 +38,23 @@
                 var Draggable = FullCalendarInteraction.Draggable;
                 var calendarEl = document.getElementById('calendar');
                 var draggableEl = document.getElementById('external-events');
+                var selectList = document.getElementById("subordinate-select-list");
                 var clickedDate;
                 var selectedDayId;
                 var workerRestrictions;
+                var selectedWorkerId;
+                selectedWorkerId = selectList.options[selectList.selectedIndex].value;
 
-                $.get("/Calendar/GetWorkerRestrictions", function (data, status) {
-                    workerRestrictions = JSON.parse(data);
-                });
+                // Subordinates select list setup
+                window.onload = function () {
+                    refreshSuggestedTopics();
+                    selectList.onchange = function () {
+                        selectedWorkerId = this.value;
+                        getWorkerRestrictions();
+                        refreshSuggestedTopics();
+                        calendar.refetchEvents();
+                    }
+                }
 
                 new Draggable(draggableEl, {
                     itemSelector: '.draggable-element',
@@ -59,10 +69,18 @@
 
                 var calendar = new Calendar(calendarEl, {
                     plugins: ['interaction', 'dayGrid'],
-                    events:
-                    {
-                        url: '/Calendar/GetLearningDays',
-                        overlap: false
+                    events: {
+                        url: '/ManagerCalendar/GetLearningDays',
+                        method: 'GET',
+                        extraParams: function () {
+                            var workerId = selectedWorkerId;
+                            return {
+                                subordinateId: workerId
+                            }
+                        },
+                        failure: function () {
+                            alert('There was an error while fetching events');
+                        }
                     },
                     timeZone: 'UTC',
                     droppable: true,
@@ -74,7 +92,9 @@
                         var eventId = info.draggedEl.getAttribute("eventId");
                         var answer = confirm("Assign new learning day on selected time slot?");
                         if (answer) {
-                            var data0 = { Id: parseInt(eventId), Title: info.draggedEl.innerText, Start: info.date };
+                            var list = document.getElementById("subordinate-select-list");
+                            selectedWorkerId = list.options[list.selectedIndex].value;
+                            var data0 = { Id: parseInt(eventId), Title: info.draggedEl.innerText, Start: info.date, WorkerId: selectedWorkerId };
                             var json = JSON.stringify(data0);
                             $.ajax({
                                 type: "POST",
@@ -365,6 +385,51 @@
                     document.getElementById("violated-restriction").innerText = "";
                 }
 
+                function getWorkerRestrictions() {
+                    var list = document.getElementById("subordinate-select-list");
+                    selectedWorkerId = list.options[list.selectedIndex].value;
+                    if (selectedWorkerId == "") {
+                        return;
+                    }
+                    $.ajax({
+                        type: "GET",
+                        url: '/ManagerCalendar/GetWorkerRestrictions',
+                        dataType: "json",
+                        data: { subordinateId: selectedWorkerId },
+                        success: function (data) {
+                            workerRestrictions = JSON.parse(data);
+                            return;
+                        }
+                    });
+                }
+
+                function refreshSuggestedTopics() {
+                    var list = document.getElementById("subordinate-select-list");
+                    selectedWorkerId = list.options[list.selectedIndex].value;
+                    if (selectedWorkerId == "") {
+                        return;
+                    }
+                    $.ajax({
+                        type: "GET",
+                        url: '/ManagerCalendar/GetSuggestedTopics',
+                        dataType: "json",
+                        data: { subordinateId: selectedWorkerId },
+                        success: function (data) {
+                            var list = document.getElementById("events-list");
+                            list.innerHTML = '';
+                            data.forEach(function (item) {
+                                var div = document.createElement("div");
+                                div.setAttribute("eventId", item.id);
+                                div.setAttribute("class", "draggable-element");
+                                var text = document.createTextNode(item.title);
+                                div.appendChild(text);
+                                list.appendChild(div);
+                            });
+                            return;
+                        }
+                    });
+                }
+
                 calendar.render();
 
             });
@@ -376,7 +441,10 @@
     <div id="calendar-container">
         <div id="calendar-sidebar">
             <div class="subordinates-list">
-                <select class="form-control" asp-items="ViewBag.Subordinates" name="WorkerId"></select>
+                <div class="surbodinates-list-header">
+                    <strong>Showing calendar for:</strong>
+                </div>
+                <select id="subordinate-select-list" class="form-control" asp-items="ViewBag.Subordinates" name="WorkerId"></select>
             </div>
             <div id="external-events">
                 <div class="external-events-header">
@@ -386,14 +454,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="events-list">
-                    @{
-                        var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
-                        foreach (var item in suggestedTopics)
-                        {
-                            <div class="draggable-element" eventId="@item.Id">@item.Title</div>
-                        }
-                    }
+                <div id="events-list" class="events-list">
                 </div>
                 <div class="instructions">
                     <p>
