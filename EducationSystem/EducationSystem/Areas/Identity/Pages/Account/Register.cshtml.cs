@@ -22,18 +22,21 @@ namespace EducationSystem.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWorker _workerService;
 
 
-        public RegisterModel(SignInManager<ApplicationUser> signInManager, 
+        public RegisterModel(SignInManager<ApplicationUser> signInManager,
             ILogger<LoginModel> logger,
             UserManager<ApplicationUser> userManager,
-            IWorker workerService)
+            IWorker workerService,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _workerService = workerService;
             _logger = logger;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -71,9 +74,24 @@ namespace EducationSystem.Areas.Identity.Pages.Account
         }
         public async Task<IActionResult> OnPostAsync()
         {
+
             var user = new ApplicationUser();
             user.Email = Input.Email;
             user.UserName = Input.Username;
+
+            var exist = await _userManager.FindByEmailAsync(user.Email);
+            if (exist != null)
+            {
+                ErrorMessage = "User wasnt created";
+                return RedirectToPage();
+            }
+            exist = null;
+            exist = await _userManager.FindByNameAsync(user.UserName);
+            if (exist != null)
+            {
+                ErrorMessage = "User wasnt created";
+                return RedirectToPage();
+            }
 
             var worker = new Worker()
             {
@@ -85,9 +103,18 @@ namespace EducationSystem.Areas.Identity.Pages.Account
 
             user.WorkerId = workerId;
 
-            var result = await _userManager.CreateAsync(user,Input.Password);
+            var result = await _userManager.CreateAsync(user, Input.Password);
             if (result.Succeeded)
             {
+                var doesRoleExist = await _roleManager.FindByNameAsync("Worker");
+
+                if (doesRoleExist == null)
+                {
+                    await _roleManager.CreateAsync(new IdentityRole("Worker"));
+                }
+
+                await _userManager.AddToRoleAsync(user, "Worker");
+
                 ErrorMessage = "User successfully created";
                 return RedirectToPage();
             }
@@ -96,7 +123,6 @@ namespace EducationSystem.Areas.Identity.Pages.Account
                 ErrorMessage = "Something went wrong";
                 return RedirectToPage();
             }
-            return Page();
         }
     }
 }
