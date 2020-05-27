@@ -43,7 +43,7 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
             var allSubordinates = _workerService.getAllSubordinates(currentUser.WorkerId);
-            var educationSystemDbContext=new List<Team>();
+            var educationSystemDbContext = new List<Team>();
             educationSystemDbContext.Add(_context.Teams.Include(t => t.Manager).FirstOrDefault(t => t.WorkerId == currentUser.WorkerId));
 
             foreach (Worker subordinate in allSubordinates)
