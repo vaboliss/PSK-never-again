@@ -3,6 +3,8 @@ using EducationSystem.Interfaces;
 using EducationSystem.Models;
 using EducationSystem.Data;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace EducationSystem.Provider
 {
@@ -17,13 +19,17 @@ namespace EducationSystem.Provider
 
         public Topic GetTopicById(int id)
         {
-            var topic = _edu.Topics.Where(t=> t.Id == id);
+            var topic = _edu.Topics.Include(p=>p.Parent).Where(t=> t.Id == id);
 
             if (topic.Any())
             {
                 return topic.First();
             }
             return null;
+        }
+        public async Task<List<Topic>> GetAllTopics() { // Only topics, not subtopics
+            var topics = await _edu.Topics.Where(t => t.Parent == null).ToListAsync();
+            return topics;
         }
 
         public List<Worker> GetWorkersByTopic(int topicId)
