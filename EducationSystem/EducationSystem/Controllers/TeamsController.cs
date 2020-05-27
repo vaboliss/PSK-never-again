@@ -156,12 +156,7 @@ namespace EducationSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,byte[] rowVersion)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            
+        {          
             
             var teamToUpdate = await _context.Teams.Include(i => i.Manager).Include(t => t.Manager.Subordinates).FirstOrDefaultAsync(m => m.Id == id);
             

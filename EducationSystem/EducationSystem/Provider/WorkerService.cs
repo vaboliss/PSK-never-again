@@ -162,7 +162,7 @@ namespace EducationSystem.Provider
                 result.AddRange(getAllSubordinates(subordinate.Id));
             }
 
-            return result
+            return result;
         }
     }
 }
