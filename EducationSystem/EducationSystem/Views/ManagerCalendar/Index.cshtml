@@ -25,7 +25,6 @@
                 crossorigin="anonymous"></script>
 
         <script>
-
             document.addEventListener('DOMContentLoaded', function () {
 
                 const dateViolation = "Chosen date must be later than current day";
@@ -38,13 +37,25 @@
                 var Draggable = FullCalendarInteraction.Draggable;
                 var calendarEl = document.getElementById('calendar');
                 var draggableEl = document.getElementById('external-events');
+                var selectList = document.getElementById("subordinate-select-list");
                 var clickedDate;
                 var selectedDayId;
                 var workerRestrictions;
+                var selectedWorkerId;
+                selectedWorkerId = selectList.options[selectList.selectedIndex].value;
 
-                $.get("/Calendar/GetWorkerRestrictions", function (data, status) {
-                    workerRestrictions = JSON.parse(data);
-                });
+                // Subordinates select list setup
+                window.onload = function () {
+                    refreshSuggestedTopics();
+                    getWorkerRestrictions();
+                    selectList.onchange = function () {
+                        selectedWorkerId = this.value;
+                        hideDayInfo();
+                        getWorkerRestrictions();
+                        refreshSuggestedTopics();
+                        calendar.refetchEvents();
+                    }
+                }
 
                 new Draggable(draggableEl, {
                     itemSelector: '.draggable-element',
@@ -59,10 +70,18 @@
 
                 var calendar = new Calendar(calendarEl, {
                     plugins: ['interaction', 'dayGrid'],
-                    events:
-                    {
-                        url: '/Calendar/GetLearningDays',
-                        overlap: false
+                    events: {
+                        url: '/ManagerCalendar/GetLearningDays',
+                        method: 'GET',
+                        extraParams: function () {
+                            var workerId = selectedWorkerId;
+                            return {
+                                subordinateId: workerId
+                            }
+                        },
+                        failure: function () {
+                            alert('There was an error while fetching events');
+                        }
                     },
                     timeZone: 'UTC',
                     firstDay: 1,
@@ -76,19 +95,21 @@
                         var eventId = info.draggedEl.getAttribute("eventId");
                         var answer = confirm("Assign new learning day on selected time slot?");
                         if (answer) {
-                            var data0 = { Id: parseInt(eventId), Title: info.draggedEl.innerText, Start: info.date };
+                            var list = document.getElementById("subordinate-select-list");
+                            selectedWorkerId = list.options[list.selectedIndex].value;
+                            var data0 = { Id: parseInt(eventId), Title: info.draggedEl.innerText, Start: info.date, WorkerId: parseInt(selectedWorkerId) };
                             var json = JSON.stringify(data0);
                             $.ajax({
                                 type: "POST",
-                                url: '/Calendar/CreateLearningDay',
+                                url: '/ManagerCalendar/CreateLearningDay',
                                 contentType: "application/json; charset=utf-8",
                                 dataType: "json",
                                 data: json,
-                                success: function (results, responseText) {
+                                success: function () {
                                     calendar.refetchEvents();
                                     return;
                                 },
-                                error: function (status, error) {
+                                error: function () {
                                     info.revert();
                                     return;
                                 }
@@ -110,16 +131,18 @@
                         return dateAllowed(dropInfo.start);
                     },
                     eventClick: function (info) {
-                        showDayInfo();
-                        var data0 = { TopicName: info.event.title, Start: info.event.start };
+                        var list = document.getElementById("subordinate-select-list");
+                        selectedWorkerId = list.options[list.selectedIndex].value;
+                        var data0 = { TopicName: info.event.title, Start: info.event.start, WorkerId: parseInt(selectedWorkerId) };
                         var json = JSON.stringify(data0);
                         $.ajax({
                             type: "POST",
-                            url: '/Calendar/GetDayInfo',
+                            url: '/ManagerCalendar/GetDayInfo',
                             contentType: "application/json; charset=utf-8",
                             dataType: "json",
                             data: json,
-                            success: function (data, responseText) {
+                            success: function (data) {
+                                showDayInfo();
                                 dayInfo = JSON.parse(data);
                                 displayDayInfo(dayInfo);
                                 selectedDayId = dayInfo.Id;
@@ -186,18 +209,20 @@
                             {
                                 text: "Confirm",
                                 click: function () {
+                                    var list = document.getElementById("subordinate-select-list");
+                                    selectedWorkerId = list.options[list.selectedIndex].value;
                                     var topicName = document.forms["topicForm"]["topic-name"].value;
                                     var topicDescription = document.forms["topicForm"]["topic-description"].value;
 
-                                    var data0 = { TopicName: topicName, TopicDescription: topicDescription, Start: clickedDate };
+                                    var data0 = { TopicName: topicName, TopicDescription: topicDescription, Start: clickedDate, WorkerId: parseInt(selectedWorkerId) };
                                     var json = JSON.stringify(data0);
                                     $.ajax({
                                         type: "POST",
-                                        url: '/Calendar/CreateLearningDayAndTopic',
+                                        url: '/ManagerCalendar/CreateLearningDayAndTopic',
                                         contentType: "application/json; charset=utf-8",
                                         dataType: "json",
                                         data: json,
-                                        success: function (results, responseText) {
+                                        success: function (responseText) {
                                             console.log("success : " + responseText);
                                             $('#calendar').html(res).delay(1000);
                                             return;
@@ -324,7 +349,7 @@
                     var json = JSON.stringify(data0);
                     $.ajax({
                         type: "PUT",
-                        url: '/Calendar/UpdateComments',
+                        url: '/ManagerCalendar/UpdateComments',
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: json,
@@ -363,6 +388,53 @@
                     document.getElementById("violated-restriction").innerText = "";
                 }
 
+                // Fetches selected worker restrictions
+                function getWorkerRestrictions() {
+                    var list = document.getElementById("subordinate-select-list");
+                    selectedWorkerId = list.options[list.selectedIndex].value;
+                    if (selectedWorkerId == "") {
+                        return;
+                    }
+                    $.ajax({
+                        type: "GET",
+                        url: '/ManagerCalendar/GetWorkerRestrictions',
+                        dataType: "json",
+                        data: { subordinateId: selectedWorkerId },
+                        success: function (data) {
+                            workerRestrictions = JSON.parse(data);
+                            return;
+                        }
+                    });
+                }
+
+                // Refetches suggested topics for selected worker
+                function refreshSuggestedTopics() {
+                    var list = document.getElementById("subordinate-select-list");
+                    selectedWorkerId = list.options[list.selectedIndex].value;
+                    if (selectedWorkerId == "") {
+                        return;
+                    }
+                    $.ajax({
+                        type: "GET",
+                        url: '/ManagerCalendar/GetSuggestedTopics',
+                        dataType: "json",
+                        data: { subordinateId: selectedWorkerId },
+                        success: function (data) {
+                            var list = document.getElementById("events-list");
+                            list.innerHTML = '';
+                            data.forEach(function (item) {
+                                var div = document.createElement("div");
+                                div.setAttribute("eventId", item.id);
+                                div.setAttribute("class", "draggable-element");
+                                var text = document.createTextNode(item.title);
+                                div.appendChild(text);
+                                list.appendChild(div);
+                            });
+                            return;
+                        }
+                    });
+                }
+
                 document.getElementById("hide-day-info-button").onclick = hideDayInfo;
                 document.getElementById("update-comments-button").onclick = updateDayComments;
                 document.getElementById("delete-event-button").onclick = deleteEvent;
@@ -377,78 +449,77 @@
         </script>
     </head>
 
-    <body>
-        <h1>Education calendar</h1>
-        <div id="calendar-container">
-            <div id="calendar-sidebar">
-                <div id="external-events">
-                    <div class="external-events-header">
-                        <div class="external-event-title">
-                            <p>
-                                <strong>Suggested topics</strong>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="events-list">
-                        @{
-                            var suggestedTopics = ViewBag.SuggestedTopics as ICollection<EducationSystem.Views.ViewModels.EventViewModel>;
-                            foreach (var item in suggestedTopics)
-                            {
-                                <div class="draggable-element" eventId="@item.Id">@item.Title</div>
-                            }
-                        }
-                    </div>
-                    <div class="instructions">
+<body>
+    <h1>Education calendar</h1>
+    <div id="calendar-container">
+        <div id="calendar-sidebar">
+            <div class="subordinates-list">
+                <div class="surbodinates-list-header">
+                    <strong>Showing calendar for:</strong>
+                </div>
+                <select id="subordinate-select-list" class="form-control" asp-items="ViewBag.Subordinates" name="WorkerId"></select>
+            </div>
+            <div id="external-events">
+                <div class="external-events-header">
+                    <div class="external-event-title">
                         <p>
-                            Create a new topic by clicking on a date
+                            <strong>Suggested topics</strong>
                         </p>
                     </div>
                 </div>
-                <div id="restriction-warning-container">
-                    <strong id="restriction-warning">Restricted</strong>
-                    <p id="violated-restriction">
+                <div id="events-list" class="events-list">
+                </div>
+                <div class="instructions">
+                    <p>
+                        Create a new topic by clicking on a date
                     </p>
                 </div>
             </div>
-            <div id="calendar"></div>
-            <div id="calendar-sidebar-right">
-                <div id="day-info">
-                    <button id="hide-day-info-button" type="button" class="close" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <div class="day-info-header">
-                        <div class="day-info-title">
-                            <p>
-                                <strong>Day information</strong>
-                            </p>
-                        </div>
+            <div id="restriction-warning-container">
+                <strong id="restriction-warning">Restricted</strong>
+                <p id="violated-restriction">
+                </p>
+            </div>
+        </div>
+        <div id="calendar"></div>
+        <div id="calendar-sidebar-right">
+            <div id="day-info">
+                <button id="hide-day-info-button" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="day-info-header">
+                    <div class="day-info-title">
+                        <p>
+                            <strong>Day information</strong>
+                        </p>
                     </div>
-                    <div class="day-info-text">
-                        <strong>Employee</strong>
-                        <p id="info-employee"></p>
-                        <strong>Topic</strong>
-                        <p id="info-topic-name"></p>
-                        <strong>Comments</strong>
-                        <textarea id="info-comments" placeholder="Additional comments"></textarea>
-                        <div class="info-buttons">
-                            <button id="update-comments-button" type="button" class="btn btn-primary update-comments-button">Update</button>
-                            <button id="delete-event-button" type="button" class="btn btn-primary delete-event-button">Delete</button>
-                        </div>
+                </div>
+                <div class="day-info-text">
+                    <strong>Employee</strong>
+                    <p id="info-employee"></p>
+                    <strong>Topic</strong>
+                    <p id="info-topic-name"></p>
+                    <strong>Comments</strong>
+                    <textarea id="info-comments" placeholder="Additional comments"></textarea>
+                    <div class="info-buttons">
+                        <button id="update-comments-button" type="button" class="btn btn-primary update-comments-button">Update</button>
+                        <button id="delete-event-button" type="button" class="btn btn-primary delete-event-button">Delete</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="create-topic-dialog" title="Create new topic">
-            <form name="topicForm">
-                <fieldset>
-                    <input type="text" name="topic-name" id="topic-name" class="text" placeholder="Topic">
-                    <input type="text" name="topic-description" id="topic-description" class="text" placeholder="Description">
-                </fieldset>
-            </form>
-            <p class="validateTips">All fields are required</p>
-        </div>
-        <div id="validation-dialog" title="Topic cannot be empty"></div>
-        <div id="confirm-dialog" title="Confirm action">A new topic will be created. This action cannot be undone.</div>
-        <div id="event-tooltip"></div>
-    </body>
+    </div>
+    <div id="create-topic-dialog" title="Create new topic">
+        <form name="topicForm">
+            <fieldset>
+                <input type="text" name="topic-name" id="topic-name" class="text" placeholder="Topic">
+                <input type="text" name="topic-description" id="topic-description" class="text" placeholder="Description">
+            </fieldset>
+        </form>
+        <p class="validateTips">All fields are required</p>
+    </div>
+    <div id="validation-dialog" title="Topic cannot be empty"></div>
+    <div id="confirm-dialog" title="Confirm action">A new topic will be created. This action cannot be undone.</div>
+    <div id="event-tooltip"></div>
+</body>
 

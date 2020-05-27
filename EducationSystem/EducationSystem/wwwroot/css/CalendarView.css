@@ -102,4 +102,9 @@
 #info-comments {
     width: 100%;
 }
+.subordinates-list {
+    margin-top: 4em;
+    background: rgba(55, 136, 216, 0.41);
+    padding: 7px;
+}
  
