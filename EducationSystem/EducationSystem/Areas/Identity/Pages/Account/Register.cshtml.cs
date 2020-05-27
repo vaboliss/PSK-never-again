@@ -82,7 +82,7 @@ namespace EducationSystem.Areas.Identity.Pages.Account
             var exist = await _userManager.FindByEmailAsync(user.Email);
             if (exist != null)
             {
-                ErrorMessage = "User wasnt created";
+                ErrorMessage = "User wasn't created";
                 return RedirectToPage();
             }
             exist = null;
