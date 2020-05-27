@@ -1,4 +1,9 @@
 using EducationSystem.Areas.Identity;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using EducationSystem.Data;
 using EducationSystem.Interfaces;
 using EducationSystem.Models;
@@ -11,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 
 namespace EducationSystem
@@ -58,6 +64,8 @@ namespace EducationSystem
             services.AddSingleton<IEmailSender, EmailSender>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddScoped<ILearningDay, LearningDayService>();
+            services.AddScoped<IGlobalRestrictions, GlobalRestrictionsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -87,8 +95,7 @@ namespace EducationSystem
                 endpoints.MapRazorPages();
 
             });
-
-
+            app.UseStaticFiles();
         }
     }
 }

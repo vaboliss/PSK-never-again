@@ -5,6 +5,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using EducationSystem.Static;
 
 namespace EducationSystem.Provider
 {
@@ -130,8 +131,6 @@ namespace EducationSystem.Provider
             topics.RemoveAll(t => workerGoalsAsTopics.Contains(t));
             return topics;
         }
-
-
         public List<Worker> GetAvailableWorkers(int managerId)
         {
             var allworkers = _edu.Workers.Include(t => t.Subordinates).ToList();
