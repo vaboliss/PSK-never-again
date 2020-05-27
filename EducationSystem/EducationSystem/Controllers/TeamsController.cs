@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace EducationSystem.Controllers
 {
-    [Authorize(Roles="Manager")]
+    [Authorize(Roles = "Manager")]
     public class TeamsController : Controller
     {
         private readonly EducationSystemDbContext _context;
@@ -47,7 +47,7 @@ namespace EducationSystem.Controllers
             educationSystemDbContext.Add(_context.Teams.Include(t => t.Manager).FirstOrDefault(t => t.WorkerId == currentUser.WorkerId));
 
             foreach (Worker subordinate in allSubordinates)
-            educationSystemDbContext.AddRange(_context.Teams.Include(t => t.Manager).Where(t => t.Manager.Id == subordinate.Id).ToList());
+                educationSystemDbContext.AddRange(_context.Teams.Include(t => t.Manager).Where(t => t.Manager.Id == subordinate.Id).ToList());
             return View(educationSystemDbContext);
         }
 
@@ -79,7 +79,7 @@ namespace EducationSystem.Controllers
                                                      select new SelectListItem
                                                      {
                                                          Value = s.Id.ToString(),
-                                                         Text = s.FirstName +" "+ s.LastName
+                                                         Text = s.FirstName + " " + s.LastName
                                                      };
 
             ViewData["WorkerId"] = new SelectList(selectList, "Value", "Text");
@@ -97,21 +97,21 @@ namespace EducationSystem.Controllers
             if (ModelState.IsValid)
             {
 
-                var isManager = _context.Teams.Where(t=> t.WorkerId == team.WorkerId).ToList();
+                var isManager = _context.Teams.Where(t => t.WorkerId == team.WorkerId).ToList();
                 if (isManager.Any())
                 {
                     ModelState.AddModelError("", "This person already has a team");
                     var workers = _context.Workers.ToList();
                     IEnumerable<SelectListItem> selectList = from s in workers
-                                                            select new SelectListItem
-                                                            {
-                                                                Value = s.Id.ToString(),
-                                                                Text = s.FirstName + " " + s.LastName
-                                                            };
+                                                             select new SelectListItem
+                                                             {
+                                                                 Value = s.Id.ToString(),
+                                                                 Text = s.FirstName + " " + s.LastName
+                                                             };
 
                     ViewData["WorkerId"] = new SelectList(selectList, "Value", "Text");
                     return View(team);
-                    
+
                 }
                 var username = HttpContext.User.Identity.Name;
                 var currentUser = await _userManager.FindByNameAsync(username);
@@ -156,9 +156,9 @@ namespace EducationSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, byte[] rowVersion)
-        {          
+        {
             var teamToUpdate = await _context.Teams.Include(i => i.Manager).Include(t => t.Manager.Subordinates).FirstOrDefaultAsync(m => m.Id == id);
-            
+
             if (teamToUpdate == null)
             {
                 Team deletedTeam = new Team();
@@ -223,7 +223,7 @@ namespace EducationSystem.Controllers
                 }
             }
             ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", teamToUpdate.WorkerId);
-           
+
             return View(teamToUpdate);
         }
 
@@ -263,10 +263,10 @@ namespace EducationSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Team team)
         {
-             
+
             try
             {
-                var teamToDelete =  _context.Teams.Include(t => t.Manager).Include(t => t.Manager.Subordinates)
+                var teamToDelete = _context.Teams.Include(t => t.Manager).Include(t => t.Manager.Subordinates)
                  .FirstOrDefault(m => m.Id == team.Id);
                 if (teamToDelete == null)
                 {
@@ -289,18 +289,18 @@ namespace EducationSystem.Controllers
                 {
                     return NotFound();
                 }
-                
+
                 await _userManager.RemoveFromRoleAsync(user, "Manager");
                 await _userManager.AddToRoleAsync(user, "Worker");
                 await _signInManager.RefreshSignInAsync(currentUser);
-                
+
                 return RedirectToAction("Index");
             }
             catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)
             {
                 return RedirectToAction("Delete", new { concurrencyError = true, id = team.Id });
             }
-            catch (DataException )
+            catch (DataException)
             {
                 ModelState.AddModelError(string.Empty, "Unable to delete. Try again, and if the problem persists contact your system administrator.");
                 return View(team);
@@ -340,11 +340,62 @@ namespace EducationSystem.Controllers
             }
             manager.Subordinates.Remove(_context.Workers.Find(id));
 
-             _context.SaveChanges();
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> AddRestriction(int id)
+        {
 
+            var worker = await _context.Workers.Include(i => i.Restriction)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (worker == null)
+            {
+                return NotFound();
+            }
+            return View(worker);
+        }
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddRestrictionPost(int id, [Bind("MaxConsecutiveDays,MaxPerMonth,MaxPerQuarter,MaxPerYear")] Restriction restriction)
+        {
+            var workerToupdate = await _context.Workers.Include(i => i.Restriction).FirstOrDefaultAsync(m => m.Id == id);
+
+            if (workerToupdate == null)
+            {
+                return NotFound();
+            }
+            if (workerToupdate.Restriction == null)
+            {
+                Restriction newRestriction = new Restriction();
+                workerToupdate.Restriction = newRestriction;
+            }
+            if (restriction.MaxConsecutiveDays != null)
+            {
+                workerToupdate.SetMaxConsecutiveDays(restriction.MaxConsecutiveDays);
+            }
+            if (restriction.MaxPerMonth != null)
+            {
+                workerToupdate.SetMaxPerMonth(restriction.MaxPerMonth);
+            }
+            if (restriction.MaxPerQuarter != null)
+            {
+                workerToupdate.SetMaxPerQuarter(restriction.MaxPerQuarter);
+            }
+            if (restriction.MaxPerYear != null)
+            {
+                workerToupdate.SetMaxPerYear(restriction.MaxPerYear);
+            }
+
+            _context.Update(workerToupdate);
+            await _context.SaveChangesAsync();
+            
+            return RedirectToAction(nameof(Index));
+
+        }
         private bool TeamExists(int id)
         {
             return _context.Teams.Any(e => e.Id == id);
