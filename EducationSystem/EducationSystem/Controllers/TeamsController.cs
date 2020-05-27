@@ -97,7 +97,7 @@ namespace EducationSystem.Controllers
             if (ModelState.IsValid)
             {
 
-                var isManager = _context.Teams.Where(t=> t.WorkerId==team.WorkerId).ToList();
+                var isManager = _context.Teams.Where(t=> t.WorkerId == team.WorkerId).ToList();
                 if (isManager.Any())
                 {
                     ModelState.AddModelError("", "This person already has a team");
