@@ -22,7 +22,13 @@
     </dl>
     <div>
         <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-        <a href="javascript:history.back()">Back</a>
+        @if (Model.Parent == null)
+        {
+    <a asp-action="Index">Back</a>
+        }
+        else {
+            <a asp-action = "Details" asp-route-id="@Model.Parent.Id"> Back </a>
+        }
     </div>
 
     <p>

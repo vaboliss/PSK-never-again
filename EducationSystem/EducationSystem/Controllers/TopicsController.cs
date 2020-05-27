@@ -30,7 +30,7 @@ namespace EducationSystem.Controllers
         }
 
         // GET: Topics
-        public async Task<ActionResult> Index(string sortOrder,int? emptySearch,string searchString, string currentFilter, int? page)
+        public async Task<IActionResult> Index(string sortOrder,int? emptySearch,string searchString, string currentFilter, int? page)
         {
 
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -129,7 +129,7 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var topic = await _context.Topics.Include(m=>m.SubTopics)
+            var topic = await _context.Topics.Include(m => m.SubTopics).Include(m => m.Parent)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
 
