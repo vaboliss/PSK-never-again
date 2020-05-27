@@ -47,7 +47,7 @@ namespace EducationSystem.Controllers
             educationSystemDbContext.Add(_context.Teams.Include(t => t.Manager).FirstOrDefault(t => t.WorkerId == currentUser.WorkerId));
 
             foreach (Worker subordinate in allSubordinates)
-            educationSystemDbContext.AddRange(_context.Teams.Include(t => t.Manager).Where(t=>t.Manager.Id==subordinate.Id).ToList());
+            educationSystemDbContext.AddRange(_context.Teams.Include(t => t.Manager).Where(t => t.Manager.Id == subordinate.Id).ToList());
             return View(educationSystemDbContext);
         }
 
