@@ -7,20 +7,22 @@
 @{
     ViewData["Title"] = "Index";
 }
+<head>
+    <link href='~/css/EducationSystem.css' rel='stylesheet' />
+</head>
+<h2>Available topics to study</h2>
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 @using (Html.BeginForm())
 {
-<p>
+<div class="topics-header">
     @Html.Hidden("SortOrder", (object)ViewBag.NameSortParm)
     @Html.Hidden("EmptySearch", 0)
-    Find by name: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+    Find topic by name @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
     <input type="submit" value="Search" />
-</p>
+    <div class="add-topic-button">
+        <a class="btn btn-primary" asp-action="Create">Add new topic</a>
+    </div>
+</div>
 }
 <table class="table">
 

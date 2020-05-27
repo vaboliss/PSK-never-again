@@ -11,3 +11,20 @@
 .dropdown-menu > li {
     transition-duration: 0.2s;
 }
+.topics-header {
+    display: flex;
+    margin: 1em 2em;
+    margin-left: 0px;
+}
+.add-topic-button {
+    right: 0px;
+    max-height: 50px;
+}
+.btn, .btn-primary {
+    color: #fff;
+    background-color: #3788d8;
+}
+.btn:hover, .btn-primary:hover {
+    color: #fff;
+    background-color: #225587;
+}
