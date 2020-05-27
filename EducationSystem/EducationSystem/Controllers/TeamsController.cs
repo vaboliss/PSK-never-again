@@ -35,8 +35,20 @@ namespace EducationSystem.Controllers
         // GET: Teams
         public async Task<IActionResult> Index()
         {
-            var educationSystemDbContext = _context.Teams.Include(t => t.Manager);
-            return View(await educationSystemDbContext.ToListAsync());
+
+            var username = HttpContext.User.Identity.Name;
+            var currentUser = await _userManager.FindByNameAsync(username);
+            if (currentUser == null)
+            {
+                return NotFound();
+            }
+            var allSubordinates = _workerService.getAllSubordinates(currentUser.WorkerId);
+            var educationSystemDbContext=new List<Team>();
+            educationSystemDbContext.Add(_context.Teams.Include(t => t.Manager).FirstOrDefault(t => t.WorkerId == currentUser.WorkerId));
+
+            foreach (Worker subordinate in allSubordinates)
+            educationSystemDbContext.AddRange(_context.Teams.Include(t => t.Manager).Where(t=>t.Manager.Id==subordinate.Id).ToList());
+            return View(educationSystemDbContext);
         }
 
         // GET: Teams/Details/5
