@@ -129,7 +129,8 @@ namespace EducationSystem.Controllers
                 {
                     _workerService.RemoveLearned(worker, topic);
                 }
-            }else
+            }
+            else
             {
                 if (!learned)
                 {
@@ -322,18 +323,6 @@ namespace EducationSystem.Controllers
 
             return View(topic);
         }
-
-        // POST: Topics/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var topic = await _context.Topics.FindAsync(id);
-            _context.Topics.Remove(topic);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
    
 
         private bool TopicExists(int id)

@@ -64,7 +64,6 @@
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
 
                     @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
                     {
@@ -114,18 +113,14 @@ Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.Page
         PageClasses = new string[] { "page-link" }
     })
 @functions{
-    // This will safely trim your string (regardless if it is null or not)
     public string Truncate(string yourString)
     {
-        // If the string isn't null or empty
         if (!String.IsNullOrEmpty(yourString))
         {
-            // Return the appropriate string size
             return (yourString.Length <= 50) ? yourString : yourString.Substring(0, 50) + "...";
         }
         else
         {
-            // Otherwise return the empty string
             return "";
         }
     }

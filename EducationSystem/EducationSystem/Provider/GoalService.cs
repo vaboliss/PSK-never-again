@@ -10,8 +10,5 @@ namespace EducationSystem.Provider
         {
             _edu = edu;
         }
-
-
-
     }
 }

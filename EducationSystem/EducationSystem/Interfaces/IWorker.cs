@@ -9,7 +9,7 @@ namespace EducationSystem.Interfaces
         void RemoveWorkerById(int id);
 
         public List<Worker> GetAvailableWorkers(int managerId);
-        public bool  AssignWorkers(int managerId, int workerId);
+        public bool AssignWorkers(int managerId, int workerId);
         public bool AssingLearned(Worker worker, Topic topic);
         public List<Worker> GetCurrentWorkers(int managerId);
 

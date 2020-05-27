@@ -85,18 +85,11 @@ namespace EducationSystem.Provider
             }
             return true;
         }
-
-
-
-        //WorkerTopic
         public List<Topic> GetWorkersTopics(Worker worker)
         {
             var topicList = _edu.WorkerTopics.Where(g => g.Worker == worker).Select(g => g.Topic).ToList();
             return topicList;
         }
-
-
-
         // Returns a list of topics that are assigned as goals to the particular worker
         public List<Topic> GetWorkerGoalsAsTopics (Worker worker)
         {
