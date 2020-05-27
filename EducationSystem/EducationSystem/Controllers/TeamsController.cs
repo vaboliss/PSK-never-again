@@ -209,7 +209,7 @@ namespace EducationSystem.Controllers
                         if (databaseValues.WorkerId != clientValues.WorkerId)
                         {
                             Worker databaseWorker = await _context.Workers.FirstOrDefaultAsync(i => i.Id == databaseValues.WorkerId);
-                            ModelState.AddModelError("WorkerId", $"Current value: {databaseWorker?.LastName+ databaseWorker?.FirstName}");
+                            ModelState.AddModelError("WorkerId", $"Current value: {databaseWorker?.LastName + databaseWorker?.FirstName}");
                         }
 
                         ModelState.AddModelError(string.Empty, "The record you attempted to edit "
