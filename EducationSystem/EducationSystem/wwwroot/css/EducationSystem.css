@@ -1,0 +1,10 @@
+﻿#user-icon {
+    max-height: 30px;
+    min-height: 10px;
+}
+.dropdown:hover {
+    cursor: pointer;
+}
+.dropdown-menu > li:hover {
+    background: rgba(0, 148, 255, 0.25);
+}
