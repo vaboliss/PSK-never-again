@@ -25,7 +25,6 @@
             crossorigin="anonymous"></script>
 
     <script>
-
             document.addEventListener('DOMContentLoaded', function () {
 
                 const dateViolation = "Chosen date must be later than current day";
@@ -315,14 +314,11 @@
                     return true;
                 }
 
+                // Hides Day info popup
                 function hideDayInfo() {
                     clearDayInfo();
                     document.getElementById("calendar-sidebar-right").style.display = "none";
                 }
-
-                document.getElementById("hide-day-info-button").onclick = hideDayInfo;
-                document.getElementById("update-comments-button").onclick = updateDayComments;
-                document.getElementById("delete-event-button").onclick = deleteEvent;
 
                 // DELETE request for deleting learning days
                 function deleteEvent() {
@@ -363,10 +359,12 @@
                     });
                 }
 
+                // Shows day info popup
                 function showDayInfo() {
                     document.getElementById("calendar-sidebar-right").style.display = "block";
                 }
 
+                // Displays appropriate information in the day info popup
                 function displayDayInfo(dayInfo) {
                     document.getElementById("calendar-sidebar-right").style.display = "block";
                     document.getElementById("info-topic-name").innerText = dayInfo.TopicName;
@@ -375,22 +373,20 @@
 
                 }
 
+                // Clears day info popup information
                 function clearDayInfo() {
                     document.getElementById("info-topic-name").innerText = "";
                     document.getElementById("info-employee").innerText = "";
                     document.getElementById("info-comments").value = "";
                 }
 
-                document.getElementById('calendar').addEventListener('mouseleave', e => {
-                    document.getElementById("restriction-warning-container").style.display = "none";
-                    document.getElementById("violated-restriction").innerText = "";
-                });
-
+                // Hides restriction popup
                 function hideRestriction() {
                     document.getElementById("restriction-warning-container").style.display = "none";
                     document.getElementById("violated-restriction").innerText = "";
                 }
 
+                // Fetches selected worker restrictions
                 function getWorkerRestrictions() {
                     var list = document.getElementById("subordinate-select-list");
                     selectedWorkerId = list.options[list.selectedIndex].value;
@@ -409,6 +405,7 @@
                     });
                 }
 
+                // Refetches suggested topics for selected worker
                 function refreshSuggestedTopics() {
                     var list = document.getElementById("subordinate-select-list");
                     selectedWorkerId = list.options[list.selectedIndex].value;
@@ -435,6 +432,14 @@
                         }
                     });
                 }
+
+                document.getElementById("hide-day-info-button").onclick = hideDayInfo;
+                document.getElementById("update-comments-button").onclick = updateDayComments;
+                document.getElementById("delete-event-button").onclick = deleteEvent;
+                document.getElementById('calendar').addEventListener('mouseleave', e => {
+                    document.getElementById("restriction-warning-container").style.display = "none";
+                    document.getElementById("violated-restriction").innerText = "";
+                });
 
                 calendar.render();
 
