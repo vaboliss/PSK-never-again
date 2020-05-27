@@ -11,9 +11,11 @@ using System;
 using X.PagedList;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EducationSystem.Controllers
 {
+    [Authorize]
     public class TopicsController : Controller
     {
 
