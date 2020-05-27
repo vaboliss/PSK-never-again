@@ -34,7 +34,14 @@ namespace EducationSystem.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            ViewData["Subordinates"] = new SelectList(await GetManagerSubordinates(), nameof (Worker.Id), nameof(Worker.FirstName));
+            List<Worker> workers = await GetManagerSubordinates();
+            IEnumerable<SelectListItem> selectList = from s in workers
+                                                     select new SelectListItem
+                                                     {
+                                                         Value = s.Id.ToString(),
+                                                         Text = s.FirstName + " " + s.LastName
+                                                     };
+            ViewData["Subordinates"] = new SelectList(selectList, "Value", "Text");
             return View();
         }
 
