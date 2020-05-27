@@ -375,6 +375,9 @@
     <h1>Education calendar</h1>
     <div id="calendar-container">
         <div id="calendar-sidebar">
+            <div class="subordinates-list">
+                <select class="form-control" asp-items="ViewBag.Subordinates" name="WorkerId"></select>
+            </div>
             <div id="external-events">
                 <div class="external-events-header">
                     <div class="external-event-title">

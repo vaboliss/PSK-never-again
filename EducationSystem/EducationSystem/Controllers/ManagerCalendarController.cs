@@ -1,10 +1,12 @@
 ﻿using EducationSystem.Data;
+using EducationSystem.Interfaces;
 using EducationSystem.Models;
 using EducationSystem.Static;
 using EducationSystem.Views.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,18 +22,30 @@ namespace EducationSystem.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
 
+        private readonly IWorker _workerService;
+
         private ApplicationUser currentUser;
 
-        public ManagerCalendarController(EducationSystemDbContext context, UserManager<ApplicationUser> userManager)
+        public ManagerCalendarController(EducationSystemDbContext context, UserManager<ApplicationUser> userManager, IWorker workerService)
         {
             _context = context;
             _userManager = userManager;
+            _workerService = workerService;
         }
-        public async Task<IActionResult> IndexAsync()
+        public async Task<IActionResult> Index()
         {
             await GetSuggestedTopics();
+            ViewData["Subordinates"] = new SelectList(await GetManagerSubordinates(), nameof (Worker.Id), nameof(Worker.FirstName));
             return View();
         }
+
+        // Returns manager subordinates
+        public async Task<List<Worker>> GetManagerSubordinates()
+        {
+            currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+            return _workerService.GetCurrentWorkers(currentUser.WorkerId);
+        }
+
 
         // Creates a list of learning days for the calendar to display
         [HttpGet]
@@ -111,7 +125,7 @@ namespace EducationSystem.Controllers
                 var jsonData = JsonSerializer.Serialize(eventModel);
                 return Json(jsonData);
             }
-            return View(IndexAsync());
+            return View(Index());
         }
 
         // Creates LearningDay and new Topic from the calendar
@@ -137,7 +151,7 @@ namespace EducationSystem.Controllers
                 _context.SaveChanges();
                 return View(learningDay);
             }
-            return View(IndexAsync());
+            return View(Index());
         }
 
         // Returns specified day info

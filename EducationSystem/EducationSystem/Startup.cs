@@ -47,7 +47,11 @@ namespace EducationSystem
                 .AddEntityFrameworkStores<EducationSystemDbContext>()
                 .AddSignInManager<SignInManager<ApplicationUser>>()
                 .AddDefaultTokenProviders();
-
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireManagerRole",
+                     policy => policy.RequireRole("Manager"));
+            });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
             .AddRazorPagesOptions(options =>
             { 
