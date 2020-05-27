@@ -289,6 +289,7 @@ namespace EducationSystem.Controllers
                 {
                     return NotFound();
                 }
+                
                 await _userManager.RemoveFromRoleAsync(user, "Manager");
                 await _userManager.AddToRoleAsync(user, "Worker");
                 await _signInManager.RefreshSignInAsync(currentUser);
