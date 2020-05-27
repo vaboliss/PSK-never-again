@@ -32,17 +32,17 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Topics" asp-action="Index">Topics</a>
-                        </li> 
-                         <li class="nav-item">
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Calendar" asp-action="Index">Calendar</a>
                         </li>
-                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Manager"))
+                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Manager"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Teams" asp-action="Index">Teams</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="ManagerCalendar" asp-action="Index">Team Calendar</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="ManagerCalendar" asp-action="Index">Team Calendar</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Teams" asp-action="Index">Teams</a>
                             </li>
                         }
                     </ul>
