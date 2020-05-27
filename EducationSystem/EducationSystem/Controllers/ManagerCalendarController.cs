@@ -45,7 +45,6 @@ namespace EducationSystem.Controllers
             return _workerService.GetCurrentWorkers(currentUser.WorkerId);
         }
 
-
         // Creates a list of learning days for the calendar to display
         [HttpGet]
         public IActionResult GetLearningDays([FromQuery] int subordinateId)
@@ -113,16 +112,15 @@ namespace EducationSystem.Controllers
 
         // Creates LearningDay entity from the calendar
         [HttpPost]
-        public async Task<IActionResult> CreateLearningDay([FromBody] EventViewModel eventModel)
+        public IActionResult CreateLearningDay([FromBody] EventViewModel eventModel)
         {
             if (ModelState.IsValid)
             {
-                currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
                 Topic topic = _context.Find<Topic>(eventModel.Id);
                 LearningDay learningDay = new LearningDay();
                 learningDay.Topic = topic;
                 learningDay.TopicId = topic.Id;
-                learningDay.Worker = _context.Find<Worker>(currentUser.WorkerId);
+                learningDay.Worker = _context.Find<Worker>(eventModel.WorkerId);
                 learningDay.WorkerId = eventModel.WorkerId;
                 learningDay.Date = eventModel.Start;
                 _context.Add(learningDay);
@@ -130,16 +128,20 @@ namespace EducationSystem.Controllers
                 var jsonData = JsonSerializer.Serialize(eventModel);
                 return Json(jsonData);
             }
-            return View(Index());
+            return NotFound();
         }
 
         // Creates LearningDay and new Topic from the calendar
         [HttpPost]
-        public async Task<IActionResult> CreateLearningDayAndTopic([FromBody] EventViewModel eventModel)
+        public IActionResult CreateLearningDayAndTopic([FromBody] EventViewModel eventModel)
         {
             if (ModelState.IsValid)
             {
-                currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+                Worker worker = _context.Find<Worker>(eventModel.WorkerId);
+                if (worker == null)
+                {
+                    return NotFound();
+                }
                 Topic topic = new Topic();
                 topic.Name = eventModel.TopicName;
                 topic.Description = eventModel.TopicDescription;
@@ -148,8 +150,8 @@ namespace EducationSystem.Controllers
                 LearningDay learningDay = new LearningDay();
                 learningDay.Topic = topic;
                 learningDay.TopicId = topic.Id;
-                learningDay.Worker = _context.Find<Worker>(currentUser.WorkerId);
-                learningDay.WorkerId = currentUser.WorkerId;
+                learningDay.Worker = worker;
+                learningDay.WorkerId = worker.Id;
                 learningDay.Date = eventModel.Start;
                 _context.Add(learningDay);
 
@@ -161,18 +163,17 @@ namespace EducationSystem.Controllers
 
         // Returns specified day info
         [HttpPost]
-        public async Task<IActionResult> GetDayInfo([FromBody] EventViewModel eventModel)
+        public IActionResult GetDayInfo([FromBody] EventViewModel eventModel)
         {
             if (ModelState.IsValid)
             {
-                currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
-                var learningDays = _context.LearningDays.Where(ld => ld.Date == eventModel.Start && ld.Topic.Name == eventModel.TopicName).Include(ld => ld.Topic).ToList();
+                var learningDays = _context.LearningDays.Where(ld => ld.Date == eventModel.Start && ld.Topic.Name == eventModel.TopicName && ld.WorkerId == eventModel.WorkerId).Include(ld => ld.Topic).ToList();
                 if (!learningDays.Any())
                 {
                     return NotFound();
                 }
                 var learningDay = learningDays.First();
-                Worker worker = _context.Find<Worker>(currentUser.WorkerId);
+                Worker worker = _context.Find<Worker>(eventModel.WorkerId);
                 EventViewModel dayInfo = new EventViewModel();
                 dayInfo.Title = worker.FirstName + " " + worker.LastName;
                 dayInfo.TopicName = learningDay.Topic.Name;

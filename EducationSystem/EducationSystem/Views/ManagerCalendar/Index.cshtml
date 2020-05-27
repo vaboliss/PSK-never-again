@@ -48,8 +48,10 @@
                 // Subordinates select list setup
                 window.onload = function () {
                     refreshSuggestedTopics();
+                    getWorkerRestrictions();
                     selectList.onchange = function () {
                         selectedWorkerId = this.value;
+                        hideDayInfo();
                         getWorkerRestrictions();
                         refreshSuggestedTopics();
                         calendar.refetchEvents();
@@ -94,19 +96,19 @@
                         if (answer) {
                             var list = document.getElementById("subordinate-select-list");
                             selectedWorkerId = list.options[list.selectedIndex].value;
-                            var data0 = { Id: parseInt(eventId), Title: info.draggedEl.innerText, Start: info.date, WorkerId: selectedWorkerId };
+                            var data0 = { Id: parseInt(eventId), Title: info.draggedEl.innerText, Start: info.date, WorkerId: parseInt(selectedWorkerId) };
                             var json = JSON.stringify(data0);
                             $.ajax({
                                 type: "POST",
-                                url: '/Calendar/CreateLearningDay',
+                                url: '/ManagerCalendar/CreateLearningDay',
                                 contentType: "application/json; charset=utf-8",
                                 dataType: "json",
                                 data: json,
-                                success: function (results, responseText) {
+                                success: function () {
                                     calendar.refetchEvents();
                                     return;
                                 },
-                                error: function (status, error) {
+                                error: function () {
                                     info.revert();
                                     return;
                                 }
@@ -128,16 +130,18 @@
                         return dateAllowed(dropInfo.start);
                     },
                     eventClick: function (info) {
-                        showDayInfo();
-                        var data0 = { TopicName: info.event.title, Start: info.event.start };
+                        var list = document.getElementById("subordinate-select-list");
+                        selectedWorkerId = list.options[list.selectedIndex].value;
+                        var data0 = { TopicName: info.event.title, Start: info.event.start, WorkerId: parseInt(selectedWorkerId) };
                         var json = JSON.stringify(data0);
                         $.ajax({
                             type: "POST",
-                            url: '/Calendar/GetDayInfo',
+                            url: '/ManagerCalendar/GetDayInfo',
                             contentType: "application/json; charset=utf-8",
                             dataType: "json",
                             data: json,
-                            success: function (data, responseText) {
+                            success: function (data) {
+                                showDayInfo();
                                 dayInfo = JSON.parse(data);
                                 displayDayInfo(dayInfo);
                                 selectedDayId = dayInfo.Id;
@@ -204,18 +208,20 @@
                             {
                                 text: "Confirm",
                                 click: function () {
+                                    var list = document.getElementById("subordinate-select-list");
+                                    selectedWorkerId = list.options[list.selectedIndex].value;
                                     var topicName = document.forms["topicForm"]["topic-name"].value;
                                     var topicDescription = document.forms["topicForm"]["topic-description"].value;
 
-                                    var data0 = { TopicName: topicName, TopicDescription: topicDescription, Start: clickedDate };
+                                    var data0 = { TopicName: topicName, TopicDescription: topicDescription, Start: clickedDate, WorkerId: parseInt(selectedWorkerId) };
                                     var json = JSON.stringify(data0);
                                     $.ajax({
                                         type: "POST",
-                                        url: '/Calendar/CreateLearningDayAndTopic',
+                                        url: '/ManagerCalendar/CreateLearningDayAndTopic',
                                         contentType: "application/json; charset=utf-8",
                                         dataType: "json",
                                         data: json,
-                                        success: function (results, responseText) {
+                                        success: function (responseText) {
                                             console.log("success : " + responseText);
                                             $('#calendar').html(res).delay(1000);
                                             return;
@@ -345,7 +351,7 @@
                     var json = JSON.stringify(data0);
                     $.ajax({
                         type: "PUT",
-                        url: '/Calendar/UpdateComments',
+                        url: '/ManagerCalendar/UpdateComments',
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: json,
