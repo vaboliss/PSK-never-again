@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EducationSystem.Models
 {
-    public class Topic
+        public class TopicCreateViewModel
     {
-
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
         public string Description { get; set; }
-        public Topic Parent { get; set; }
-        public ICollection<Topic> SubTopics { get; set; } = new List<Topic>();
-        public virtual ICollection<WorkerTopic> WorkerTopics { get; set; }
+        
+        public int ParentId { get; set; }
     }
 }

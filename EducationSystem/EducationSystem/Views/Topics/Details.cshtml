@@ -1,34 +1,123 @@
-﻿@model IEnumerable<EducationSystem.Models.Worker>
-
+﻿@model EducationSystem.Models.Topic
 @{
-    ViewData["Title"] = "Workers";
+    ViewData["Title"] = "Details";
 }
 
-<h1>Workers in this team</h1>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<div>
+    <h4>Topic</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            <span style="white-space:pre-line">@Html.DisplayFor(model => model.Description)</span>
+        </dd>
+    </dl>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+        @if (Model.Parent == null)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
-                </td>
-            </tr>
+    <a asp-action="Index">Back</a>
         }
-    </tbody>
-</table>
+        else {
+            <a asp-action = "Details" asp-route-id="@Model.Parent.Id"> Back </a>
+        }
+    </div>
+
+    <p>
+        <a asp-action="Create" asp-route-id=@Model.Id>Create New</a>
+    </p>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewBag.subtopics)
+            {
+                <tr>
+                    <td>
+                        @if (item.Learned == true)
+                        {
+                            <p>&#9734;</p>
+                        }
+                    </td>
+                    <td>
+                        @item.Name
+                    </td>
+                    <td>
+                        @Truncate(item.Description)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
+                        {
+                            @Html.Hidden("topicId", (int)item.Id);
+                            @Html.Hidden("learned", (bool)item.Learned);
+                            @Html.Hidden("type", "learnUnlearn");
+                            @Html.Hidden("place", "details");
+                            @if (item.Learned == false)
+                            {
+                                <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Learn" />
+                            }
+                            else
+                            {
+                                <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Unlearn" />
+                            }
+                        }
+                        @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
+                        {
+                            @Html.Hidden("topicId", (int)item.Id);
+                            @Html.Hidden("learned", (bool)item.GoalsLearned);
+                            @Html.Hidden("type", "goal");
+                            @Html.Hidden("place", "details");
+                            @if (item.GoalsLearned == false)
+                            {
+                                <input style="color:#f00;border:0px #000 solid;background-color:#fff;" name="goal" type="submit" value="Set goal" />
+                            }
+                            else
+                            {
+                                <input style="color:#f00;border:0px #000 solid;background-color:#fff;" name="goal" type="submit" value="Unset goal" />
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+</div>
+
+@functions{
+    public string Truncate(string yourString)
+    {
+        if (!String.IsNullOrEmpty(yourString))
+        {
+            return (yourString.Length <= 50) ? yourString : yourString.Substring(0, 50) + "...";
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+}
