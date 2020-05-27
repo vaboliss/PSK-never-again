@@ -8,3 +8,6 @@
 .dropdown-menu > li:hover {
     background: rgba(0, 148, 255, 0.25);
 }
+.dropdown-menu > li {
+    transition-duration: 0.2s;
+}

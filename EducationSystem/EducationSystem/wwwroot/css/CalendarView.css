@@ -2,6 +2,7 @@
      display: flex;
      margin-left: 0px;
      margin-right: 0px;
+     margin-top: 2em;
 }
  .instructions {
      color: #212529;
@@ -76,13 +77,16 @@
  .fc-event-container {
      cursor: pointer;
 }
+.fc-event:hover {
+    background: #225587;
+}
 .update-comments-button:hover {
-    background: #1e2b37;
+    background: #225587;
 }
 .update-comments-button {
     display: flex;
     float: left;
-    background: #2c3e50;
+    background: #3788d8;
     margin-left: 0;
     margin-right: auto;
 }
@@ -107,4 +111,28 @@
     background: rgba(55, 136, 216, 0.41);
     padding: 7px;
 }
- 
+.fc-toolbar.fc-header-toolbar {
+    margin-bottom: 0px;
+    padding: 1.5em;
+    background-image: linear-gradient(to bottom, rgba(55, 136, 216, 0.35), rgba(55, 136, 216, 0.00));
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    border-bottom: 0px;
+}
+.fc-button-primary {
+    color: #fff;
+    background-color: #3788d8;
+    border-color: transparent;
+}
+.fc-button-primary:hover {
+    color: #fff;
+    background-color: #225587;
+}
+.fc-button-primary:disabled {
+    color: #fff;
+    background-color: #527ba3;
+    border-color: white;
+}
+.fc-button-primary:disabled:hover {
+    background-color: #32485e;
+}
