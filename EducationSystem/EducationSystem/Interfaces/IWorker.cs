@@ -22,6 +22,7 @@ namespace EducationSystem.Interfaces
         public List<Topic> GetWorkerGoalsAsTopics(Worker worker);
 
         public List<Topic> GetAvailableTopics(Worker worker);
+        public List<Worker> getAllSubordinates(int workerId);
 
     }
 

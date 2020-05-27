@@ -196,5 +196,23 @@ namespace EducationSystem.Provider
             return true;
         }
 
+        /// <summary>
+        /// Gets all lower level workers recursively
+        /// </summary>
+        public List<Worker>getAllSubordinates(int workerId)
+        {
+            var manager = _edu.Workers.Include(t => t.Subordinates)
+                .FirstOrDefault(m => m.Id == workerId);
+
+            List<Worker> result = new List<Worker>();
+
+            foreach (Worker subordinate in manager.Subordinates)
+            {
+                result.Add(subordinate);
+                result.AddRange(getAllSubordinates(subordinate.Id));
+            }
+
+            return result;
+        }
     }
 }

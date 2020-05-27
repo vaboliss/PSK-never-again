@@ -10,25 +10,45 @@ using EducationSystem.Models;
 using EducationSystem.Provider;
 using EducationSystem.Interfaces;
 using Microsoft.AspNetCore.Http;
+using System.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace EducationSystem.Controllers
 {
+    [Authorize(Roles="Manager")]
     public class TeamsController : Controller
     {
         private readonly EducationSystemDbContext _context;
         private readonly IWorker _workerService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public TeamsController(EducationSystemDbContext context, IWorker workerService)
+        public TeamsController(EducationSystemDbContext context, IWorker workerService, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _workerService = workerService;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: Teams
         public async Task<IActionResult> Index()
         {
-            var educationSystemDbContext = _context.Teams.Include(t => t.Manager);
-            return View(await educationSystemDbContext.ToListAsync());
+
+            var username = HttpContext.User.Identity.Name;
+            var currentUser = await _userManager.FindByNameAsync(username);
+            if (currentUser == null)
+            {
+                return NotFound();
+            }
+            var allSubordinates = _workerService.getAllSubordinates(currentUser.WorkerId);
+            var educationSystemDbContext = new List<Team>();
+            educationSystemDbContext.Add(_context.Teams.Include(t => t.Manager).FirstOrDefault(t => t.WorkerId == currentUser.WorkerId));
+
+            foreach (Worker subordinate in allSubordinates)
+            educationSystemDbContext.AddRange(_context.Teams.Include(t => t.Manager).Where(t => t.Manager.Id == subordinate.Id).ToList());
+            return View(educationSystemDbContext);
         }
 
         // GET: Teams/Details/5
@@ -77,10 +97,10 @@ namespace EducationSystem.Controllers
             if (ModelState.IsValid)
             {
 
-                var isManager = _context.Teams.Where(t=> t.WorkerId==team.WorkerId).ToList();
+                var isManager = _context.Teams.Where(t=> t.WorkerId == team.WorkerId).ToList();
                 if (isManager.Any())
                 {
-                    ModelState.AddModelError("", "This person is already a manager");
+                    ModelState.AddModelError("", "This person already has a team");
                     var workers = _context.Workers.ToList();
                     IEnumerable<SelectListItem> selectList = from s in workers
                                                             select new SelectListItem
@@ -93,6 +113,16 @@ namespace EducationSystem.Controllers
                     return View(team);
                     
                 }
+                var username = HttpContext.User.Identity.Name;
+                var currentUser = await _userManager.FindByNameAsync(username);
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.WorkerId == team.WorkerId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                await _userManager.RemoveFromRoleAsync(user, "Worker");
+                await _userManager.AddToRoleAsync(user, "Manager");
+                await _signInManager.RefreshSignInAsync(currentUser);
                 _context.Add(team);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -109,7 +139,9 @@ namespace EducationSystem.Controllers
                 return NotFound();
             }
 
-            var team = await _context.Teams.FindAsync(id);
+            var team = await _context.Teams.Include(i => i.Manager)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == id);
             if (team == null)
             {
                 return NotFound();
@@ -123,41 +155,80 @@ namespace EducationSystem.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TeamName,WorkerId")] Team team)
-        {
-            if (id != team.Id)
+        public async Task<IActionResult> Edit(int id, byte[] rowVersion)
+        {          
+            var teamToUpdate = await _context.Teams.Include(i => i.Manager).Include(t => t.Manager.Subordinates).FirstOrDefaultAsync(m => m.Id == id);
+            
+            if (teamToUpdate == null)
             {
-                return NotFound();
+                Team deletedTeam = new Team();
+                await TryUpdateModelAsync(deletedTeam);
+                ModelState.AddModelError(string.Empty,
+                    "Unable to save changes. The Team was deleted by another user.");
+                ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", deletedTeam.WorkerId);
+                return View(deletedTeam);
             }
 
-            if (ModelState.IsValid)
+            if (teamToUpdate.Manager.Subordinates.Any())
+            {
+                ModelState.AddModelError("", "You can't change team manager which has workers");
+                ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", teamToUpdate.WorkerId);
+                return View(teamToUpdate);
+            }
+
+            _context.Entry(teamToUpdate).Property("RowVersion").OriginalValue = rowVersion;
+
+            if (await TryUpdateModelAsync<Team>(
+        teamToUpdate,
+        "",
+        s => s.TeamName, s => s.WorkerId))
             {
                 try
                 {
-                    _context.Update(team);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException ex)
                 {
-                    if (!TeamExists(team.Id))
+                    var exceptionEntry = ex.Entries.Single();
+                    var clientValues = (Team)exceptionEntry.Entity;
+                    var databaseEntry = exceptionEntry.GetDatabaseValues();
+                    if (databaseEntry == null)
                     {
-                        return NotFound();
+                        ModelState.AddModelError(string.Empty,
+                            "Unable to save changes. The Team was deleted by another user.");
                     }
                     else
                     {
-                        throw;
+                        var databaseValues = (Team)databaseEntry.ToObject();
+
+                        if (databaseValues.TeamName != clientValues.TeamName)
+                        {
+                            ModelState.AddModelError("TeamName", $"Current value: {databaseValues.TeamName}");
+                        }
+                        if (databaseValues.WorkerId != clientValues.WorkerId)
+                        {
+                            Worker databaseWorker = await _context.Workers.FirstOrDefaultAsync(i => i.Id == databaseValues.WorkerId);
+                            ModelState.AddModelError("WorkerId", $"Current value: {databaseWorker?.LastName + databaseWorker?.FirstName}");
+                        }
+
+                        ModelState.AddModelError(string.Empty, "The record you attempted to edit "
+                                + "was modified by another user after you got the original value. The "
+                                + "edit operation was canceled and the current values in the database "
+                                + "have been displayed. If you still want to edit this record, click "
+                                + "the Save button again. Otherwise click the Back to List hyperlink.");
+                        teamToUpdate.RowVersion = (byte[])databaseValues.RowVersion;
+                        ModelState.Remove("RowVersion");
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-
-            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", team.WorkerId);
+            ViewData["WorkerId"] = new SelectList(_context.Workers, "Id", "Id", teamToUpdate.WorkerId);
            
-            return View(team);
+            return View(teamToUpdate);
         }
 
         // GET: Teams/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool? concurrencyError)
         {
             if (id == null)
             {
@@ -169,7 +240,20 @@ namespace EducationSystem.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (team == null)
             {
+                if (concurrencyError.GetValueOrDefault())
+                {
+                    return RedirectToAction("Index");
+                }
                 return NotFound();
+            }
+            if (concurrencyError.GetValueOrDefault())
+            {
+                ViewBag.ConcurrencyErrorMessage = "The record you attempted to delete "
+                    + "was modified by another user after you got the original values. "
+                    + "The delete operation was canceled and the current values in the "
+                    + "database have been displayed. If you still want to delete this "
+                    + "record, click the Delete button again. Otherwise "
+                    + "click the Back to List hyperlink.";
             }
             return View(team);
         }
@@ -177,18 +261,50 @@ namespace EducationSystem.Controllers
         // POST: Teams/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(Team team)
         {
-            var team = await _context.Teams.Include(t => t.Manager).Include(t => t.Manager.Subordinates)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (team.Manager.Subordinates != null)
+             
+            try
             {
-                ModelState.AddModelError("", "You can't delete a team which has workers");
+                var teamToDelete =  _context.Teams.Include(t => t.Manager).Include(t => t.Manager.Subordinates)
+                 .FirstOrDefault(m => m.Id == team.Id);
+                if (teamToDelete == null)
+                {
+                    return RedirectToAction("Index");
+                }
+                if (teamToDelete.Manager.Subordinates.Any())
+                {
+                    ModelState.AddModelError("", "You can't delete a team which has workers");
+                    return View(teamToDelete);
+                }
+                _context.Entry(teamToDelete).State = EntityState.Detached;
+                _context.Attach(team);
+                _context.Entry(team).State = EntityState.Deleted;
+                await _context.SaveChangesAsync();
+                var username = HttpContext.User.Identity.Name;
+                var currentUser = await _userManager.FindByNameAsync(username);
+                //var user = await _userManager.FindByIdAsync(manager.Id.ToString());
+                var user = await _userManager.Users.FirstOrDefaultAsync(u => u.WorkerId == teamToDelete.WorkerId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                
+                await _userManager.RemoveFromRoleAsync(user, "Manager");
+                await _userManager.AddToRoleAsync(user, "Worker");
+                await _signInManager.RefreshSignInAsync(currentUser);
+                
+                return RedirectToAction("Index");
+            }
+            catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)
+            {
+                return RedirectToAction("Delete", new { concurrencyError = true, id = team.Id });
+            }
+            catch (DataException )
+            {
+                ModelState.AddModelError(string.Empty, "Unable to delete. Try again, and if the problem persists contact your system administrator.");
                 return View(team);
             }
-            _context.Teams.Remove(team);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost, ActionName("AssignWorker")]
@@ -210,7 +326,7 @@ namespace EducationSystem.Controllers
 
         [HttpPost, ActionName("DeleteWorker")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteWorker(int? id, int? managerId)
+        public async Task<ActionResult> DeleteWorkerAsync(int? id, int? managerId)
         {
             if (id == null || managerId == null)
             {
