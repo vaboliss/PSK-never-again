@@ -13,5 +13,6 @@ namespace EducationSystem.Models
         public string Description { get; set; }
         
         public bool Learned { get;set; }
+        public bool GoalsLearned { get; set; }
     }
 }

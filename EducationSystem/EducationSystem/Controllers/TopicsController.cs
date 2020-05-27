@@ -51,7 +51,8 @@ namespace EducationSystem.Controllers
             var user =  await _userManager.FindByNameAsync(username);
             var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
             var workerTopic = _workerService.GetWorkersTopics(worker);
-            var modelTopics = MapTopicList(topics,workerTopic);
+            var goalTopic = _context.Goals.Where(g => g.Worker == worker).Select(a => a.Topic).ToList() ;
+            var modelTopics = MapTopicList(topics,workerTopic,goalTopic);
 
 
             if (!String.IsNullOrEmpty(searchString))
@@ -74,9 +75,8 @@ namespace EducationSystem.Controllers
             return View(modelTopics.ToPagedList(pageNumber,pageSize));
         }
 
-        public List<TopicModel> MapTopicList(List<Topic> topics,List<Topic> workerTopics)
+        public List<TopicModel> MapTopicList(List<Topic> topics,List<Topic> workerTopics,List<Topic> goals)
         {
-            Console.WriteLine(workerTopics.Count);
             List<TopicModel> topicModelList = new List<TopicModel>();
             foreach (var topic in topics)
             {
@@ -89,6 +89,14 @@ namespace EducationSystem.Controllers
                 else {
                     tempModel.Learned = false;
                 }
+                if (goals.Contains(topic))
+                {
+                    Console.WriteLine("hello");
+                    tempModel.GoalsLearned=true;
+                }
+                else {
+                    tempModel.GoalsLearned = false;
+                }
                 tempModel.Description = topic.Description;
                 tempModel.Id = topic.Id;
                 tempModel.Name = topic.Name;
@@ -99,23 +107,50 @@ namespace EducationSystem.Controllers
 
             return topicModelList;
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(int topicId,bool learned) {
+        public async Task<IActionResult> Learn(int topicId,bool learned,string type,string place) {
 
-            Console.WriteLine("Test");
-            var topic  = _topicService.GetTopicById(topicId);
+
+            var topic = _topicService.GetTopicById(topicId);
             var username = HttpContext.User.Identity.Name;
             var user = await _userManager.FindByNameAsync(username);
             var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
-            if (!learned)
+            if (type=="learnUnlearn")
             {
-                _workerService.AssingLearned(worker, topic);
+                if (!learned)
+                {
+                    _workerService.AssingLearned(worker, topic);
+                }
+                else
+                {
+                    _workerService.RemoveLearned(worker, topic);
+                }
+            }else
+            {
+                if (!learned)
+                {
+                    _workerService.AssignGoal(worker, topicId);
+                }
+                else {
+                    Goal goal = new Goal();
+                    goal = _context.Goals.Where(g => g.Topic == topic && g.Worker == worker).FirstOrDefault();
+                    _context.Goals.Remove(goal);
+                    _context.SaveChanges();
+                }
+
+            }
+            if (place.Equals("index"))
+            {
+                return Redirect(nameof(Index));
             }
             else {
-                _workerService.RemoveLearned(worker, topic);
+                return RedirectToAction(nameof(Details), new { id = topic.Parent.Id });
             }
-            return Redirect($"{Request.Path.ToString()}{Request.QueryString.Value.ToString()}");
+
+
+
         }
 
 
@@ -141,7 +176,8 @@ namespace EducationSystem.Controllers
             var user = await _userManager.FindByNameAsync(username);
             var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
             var workerTopic = _workerService.GetWorkersTopics(worker);
-            var modelTopics = MapTopicList(topic.SubTopics.ToList(), workerTopic);
+            var goalTopic = _context.Goals.Where(g => g.Worker == worker).Select(a => a.Topic).ToList();
+            var modelTopics = MapTopicList(topic.SubTopics.ToList(), workerTopic, goalTopic);
 
             ViewBag.subtopics = modelTopics;
 
@@ -149,26 +185,6 @@ namespace EducationSystem.Controllers
             return View(topic);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Details(int topicId, bool learned)
-        {
-
-            Console.WriteLine("Test");
-            var topic = _topicService.GetTopicById(topicId);
-            var username = HttpContext.User.Identity.Name;
-            var user = await _userManager.FindByNameAsync(username);
-            var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
-            if (!learned)
-            {
-                _workerService.AssingLearned(worker, topic);
-            }
-            else
-            {
-                _workerService.RemoveLearned(worker, topic);
-            }
-            return Redirect($"{Request.Path.ToString()}{Request.QueryString.Value.ToString()}");
-        }
 
         // GET: Topics/Create
         public IActionResult Create(int? id)

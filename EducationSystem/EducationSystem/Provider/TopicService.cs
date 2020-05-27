@@ -19,7 +19,7 @@ namespace EducationSystem.Provider
 
         public Topic GetTopicById(int id)
         {
-            var topic = _edu.Topics.Where(t=> t.Id == id);
+            var topic = _edu.Topics.Include(p=>p.Parent).Where(t=> t.Id == id);
 
             if (topic.Any())
             {

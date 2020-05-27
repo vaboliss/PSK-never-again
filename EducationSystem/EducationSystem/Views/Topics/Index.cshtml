@@ -22,7 +22,6 @@
     <input type="submit" value="Search" />
 </p>
 }
-@ViewBag.CurrentFilter
 <table class="table">
     <thead>
         <tr><th>
@@ -56,10 +55,12 @@
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
 
-                        @using (Html.BeginForm(FormMethod.Post))
+                        @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
                         {
                             @Html.Hidden("topicId", item.Id);
                             @Html.Hidden("learned", item.Learned);
+                            @Html.Hidden("type", "learnUnlearn");
+                            @Html.Hidden("place", "index");
                             @if (item.Learned == false)
                             {
                                 <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Learn" />
@@ -67,6 +68,20 @@
                             else
                             {
                                 <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Unlearn" />
+                            }
+                        }
+                        @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
+                        {
+                            @Html.Hidden("topicId", item.Id);
+                            @Html.Hidden("learned", item.GoalsLearned);
+                            @Html.Hidden("type", "goal");
+                            @Html.Hidden("place", "index");
+                            @if (item.GoalsLearned == false)
+                            {
+                                <input style="color:#f00;border:0px #000 solid;background-color:#fff;" name="goal" type="submit" value="Set goal" />
+                            }
+                            else {
+                    <input style="color:#f00;border:0px #000 solid;background-color:#fff;" name="goal" type="submit" value="Unset goal" />
                             }
                         }
 

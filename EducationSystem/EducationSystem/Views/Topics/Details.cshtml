@@ -69,10 +69,12 @@
                         <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                         <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                        @using (Html.BeginForm(FormMethod.Post))
+                        @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
                         {
                             @Html.Hidden("topicId", (int)item.Id);
                             @Html.Hidden("learned", (bool)item.Learned);
+                            @Html.Hidden("type", "learnUnlearn");
+                            @Html.Hidden("place", "details");
                             @if (item.Learned == false)
                             {
                                 <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Learn" />
@@ -80,6 +82,21 @@
                             else
                             {
                                 <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Unlearn" />
+                            }
+                        }
+                        @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
+                        {
+                            @Html.Hidden("topicId", (int)item.Id);
+                            @Html.Hidden("learned", (bool)item.GoalsLearned);
+                            @Html.Hidden("type", "goal");
+                            @Html.Hidden("place", "details");
+                            @if (item.GoalsLearned == false)
+                            {
+                                <input style="color:#f00;border:0px #000 solid;background-color:#fff;" name="goal" type="submit" value="Set goal" />
+                            }
+                            else
+                            {
+                                <input style="color:#f00;border:0px #000 solid;background-color:#fff;" name="goal" type="submit" value="Unset goal" />
                             }
                         }
                     </td>
