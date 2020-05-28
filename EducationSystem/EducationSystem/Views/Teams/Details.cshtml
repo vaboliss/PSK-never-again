@@ -55,6 +55,9 @@
         <div class="form-group">
             <input asp-action="DeleteWorker" asp-route-id="@item.Id" asp-route-managerId="@Model.Manager.Id" type="submit" value="Remove Worker" class="btn btn-primary" />
         </div>
+        <div class="form-group">
+            <input asp-action="AddRestriction" asp-route-id="@item.Id" type="submit" value="Add Restriction" class="btn btn-primary" />
+        </div>
     </dl>
 </form>
 

@@ -7,5 +7,6 @@ namespace EducationSystem.Interfaces
     {
         public List<LearningDay> GetAllLearningDays();
         public List<LearningDay> GetLearningDaysByWorker(Worker worker);
+        public void SendMail(LearningDay learningDay);
     }
 }

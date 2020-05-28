@@ -23,10 +23,14 @@ namespace EducationSystem.Controllers
 
         private ApplicationUser currentUser;
 
-        public CalendarController(EducationSystemDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly ILearningDay _learningDayService;
+
+        public CalendarController(EducationSystemDbContext context, UserManager<ApplicationUser> userManager, ILearningDay learningDayService)
         {
             _context = context;
             _userManager = userManager;
+            _learningDayService = learningDayService;
+
         }
         public async Task<IActionResult> IndexAsync()
         {
@@ -109,6 +113,7 @@ namespace EducationSystem.Controllers
                 learningDay.Date = eventModel.Start;
                 _context.Add(learningDay);
                 _context.SaveChanges();
+                _learningDayService.SendMail(learningDay);
                 var jsonData = JsonSerializer.Serialize(eventModel);
                 return Json(jsonData);
             }
@@ -134,8 +139,8 @@ namespace EducationSystem.Controllers
                 learningDay.WorkerId = currentUser.WorkerId;
                 learningDay.Date = eventModel.Start;
                 _context.Add(learningDay);
-
                 _context.SaveChanges();
+                _learningDayService.SendMail(learningDay);
                 return View(learningDay);
             }
             return View(IndexAsync());
