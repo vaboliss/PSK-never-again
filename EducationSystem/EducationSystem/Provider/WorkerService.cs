@@ -198,7 +198,7 @@ namespace EducationSystem.Provider
                     {
                         workerList.Add(w);
                     }
-                    if (_edu.Workers.Any(a => a.Subordinates! = null));
+                    if (_edu.Workers.Any(a => a.Subordinates != null))
                     {
                         workerList.AddRange(GetAllSubordinates(w.Id, topicId));
                     }

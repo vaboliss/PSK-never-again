@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Http;
 using System.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
+using System.Net;
 
 namespace EducationSystem.Controllers
 {
@@ -326,7 +328,7 @@ namespace EducationSystem.Controllers
 
         [HttpPost, ActionName("DeleteWorker")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteWorkerAsync(int? id, int? managerId)
+        public async Task<ActionResult> DeleteWorker(int? id, int? managerId)
         {
             if (id == null || managerId == null)
             {
@@ -395,6 +397,55 @@ namespace EducationSystem.Controllers
             return RedirectToAction(nameof(Index));
 
         }
+
+        [HttpGet]
+        public IActionResult GetWorkerTopics([FromQuery] int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            Worker worker = _context.Find<Worker>(id);
+            if (worker == null)
+            {
+                return NotFound();
+            }
+            List<Topic> availableTopics = _workerService.GetAvailableTopics(worker);
+            List <TopicCreateViewModel> data = new List<TopicCreateViewModel>();
+            foreach (var topic in availableTopics)
+            {
+                var item = new TopicCreateViewModel();
+                item.Id = topic.Id;
+                item.Name = topic.Name;
+                data.Add(item);
+            }
+            var jsonData = JsonSerializer.Serialize(data);
+            return Json(jsonData);
+        }
+
+        [HttpPost]
+        public IActionResult AssignGoalForWorker([FromBody] TopicCreateViewModel data)
+        {
+            if (data.Id == 0 || data.ParentId == 0)
+            {
+                return NotFound();
+            }
+            Worker worker = _context.Find<Worker>(data.Id);
+            if (worker == null)
+            {
+                return NotFound();
+            }
+            var goalCreated = _workerService.AssignGoal(worker, data.ParentId);
+            if (goalCreated)
+            {
+                return Json(data);
+            }
+            else
+            {
+                return View(HttpStatusCode.BadRequest);
+            }
+        }
+
         private bool TeamExists(int id)
         {
             return _context.Teams.Any(e => e.Id == id);

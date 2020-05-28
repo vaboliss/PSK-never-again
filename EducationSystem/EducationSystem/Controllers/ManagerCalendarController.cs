@@ -52,7 +52,7 @@ namespace EducationSystem.Controllers
         public async Task<List<Worker>> GetManagerSubordinates()
         {
             currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
-            return _workerService.GetCurrentWorkers(currentUser.WorkerId);
+            return _workerService.getAllSubordinates(currentUser.WorkerId);
         }
 
         // Creates a list of learning days for the calendar to display

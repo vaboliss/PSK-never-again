@@ -3,21 +3,21 @@
 @{
     ViewData["Title"] = "Details";
 }
-
-<h1>Details</h1>
-
+<head>
+    <link href='~/css/EducationSystem.css' rel='stylesheet' />
+</head>
+<h4>Employee details</h4>
 <div>
-    <h4>Worker</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
+            First name
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.FirstName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
+            Last name
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.LastName)
@@ -39,16 +39,31 @@ foreach (var item in topicsList)
 }
 }
 <div>
-    <form asp-action="AssignGoal">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-group">
-            <label class="control-label"></label>
-            <select class="form-control" asp-items="ViewBag.TopicsToAssign" name="TopicId"></select>
-        </div>
-        <div class="form-group">
-            <input asp-action="AssignGoal" asp-route-id="@Model.Id" type="submit" value="Assign goal" class="btn btn-primary" />
-        </div>
-    </form>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @{
+        if (ViewBag.TopicsToAssign.Items.Count > 0)
+        {
+            <hr />
+            <h5>Assign a goal for @Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)</h5>
+            <form asp-action="AssignGoal">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label class="control-label"></label>
+                    <select class="form-control w-25" asp-items="ViewBag.TopicsToAssign" name="TopicId"></select>
+                </div>
+                <div class="form-group">
+                    <input class="add-new-button btn btn-light" asp-action="AssignGoal" asp-route-id="@Model.Id" type="submit" value="Assign goal" />
+                    <a class="edu-system-button btn btn-light" href="javascript:history.back()">Back</a>
+                </div>
+            </form>
+        }
+        else
+        {
+            <p>
+                <strong>
+                    There are currently no topics this employee has not learned
+                </strong>
+            </p>
+        }
+    }
+
 </div>

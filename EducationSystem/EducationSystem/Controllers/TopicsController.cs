@@ -192,7 +192,7 @@ namespace EducationSystem.Controllers
         // GET: Topics/Create
         public IActionResult Create(int? id)
         {
-            TopicCreateViewModel tcm=new TopicCreateViewModel();
+            TopicCreateViewModel tcm = new TopicCreateViewModel();
             if (id == null)
             {
                 List<Topic> topiclist = _context.Topics.ToListAsync().Result;
@@ -216,7 +216,7 @@ namespace EducationSystem.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( TopicCreateViewModel topic)
+        public async Task<IActionResult> Create(TopicCreateViewModel topic)
         
         {
             Topic topicToCreate = new Topic() { Name = topic.Name, Description = topic.Description };

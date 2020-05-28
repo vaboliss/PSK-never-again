@@ -10,7 +10,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EducationSystem</title>
+    <title>DevBridge Education System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/login.css" />
 </head>
@@ -25,7 +25,7 @@
                         <form class="form-signin" id="account" method="post">
                             <div asp-validation-summary="All" class="text-danger"></div>
                             <div class="form-group">
-                                <label asp-for="Input.Credential"></label>
+                                <label asp-for="Input.Credential">Username</label>
                                 <input asp-for="Input.Credential" class="form-control" />
                                 <span asp-validation-for="Input.Credential" class="text-danger"></span>
                             </div>
