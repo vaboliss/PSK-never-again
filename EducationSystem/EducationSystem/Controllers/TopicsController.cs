@@ -22,7 +22,6 @@ namespace EducationSystem.Controllers
         private readonly EducationSystemDbContext _context;
         private readonly ITopic _topicService;
         private readonly IWorker _workerService;
-       // private readonly ITeam _teamService;
         private readonly UserManager<ApplicationUser> _userManager;
         public TopicsController(EducationSystemDbContext context, ITopic topicService, IWorker workerService,UserManager<ApplicationUser> userManager)
         {
@@ -30,7 +29,6 @@ namespace EducationSystem.Controllers
             _topicService = topicService;
             _userManager = userManager;
             _workerService = workerService;
-          //  _teamService = teamService;
         }
 
         // GET: Topics
@@ -325,6 +323,7 @@ namespace EducationSystem.Controllers
 
             return View(topic);
         }
+
         public async Task<IActionResult> Teams(int? Id,int? teamId)
         {
             var topic = _topicService.GetTopicById((int)Id);
@@ -334,8 +333,8 @@ namespace EducationSystem.Controllers
             var a = putIntoTeams(worker, (int)Id);
             ViewBag.teamModel = a;
             return View(topic);
-        
         }
+
         public List<TeamModel> putIntoTeams(Worker worker, int topicId)
         {
             List<TeamModel> topicModel = new List<TeamModel>();
