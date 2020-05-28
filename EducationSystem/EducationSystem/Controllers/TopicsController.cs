@@ -12,6 +12,8 @@ using X.PagedList;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace EducationSystem.Controllers
 {
@@ -23,7 +25,7 @@ namespace EducationSystem.Controllers
         private readonly ITopic _topicService;
         private readonly IWorker _workerService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public TopicsController(EducationSystemDbContext context, ITopic topicService, IWorker workerService,UserManager<ApplicationUser> userManager)
+        public TopicsController(EducationSystemDbContext context, ITopic topicService, IWorker workerService, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _topicService = topicService;
@@ -32,7 +34,7 @@ namespace EducationSystem.Controllers
         }
 
         // GET: Topics
-        public async Task<IActionResult> Index(string sortOrder,int? emptySearch,string searchString, string currentFilter, int? page)
+        public async Task<IActionResult> Index(string sortOrder, int? emptySearch, string searchString, string currentFilter, int? page)
         {
 
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -50,11 +52,11 @@ namespace EducationSystem.Controllers
             ViewBag.CurrentFilter = searchString;
             var topics = await _topicService.GetAllTopics();
             var username = HttpContext.User.Identity.Name;
-            var user =  await _userManager.FindByNameAsync(username);
+            var user = await _userManager.FindByNameAsync(username);
             var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
             var workerTopic = _workerService.GetWorkersTopics(worker);
-            var goalTopic = _context.Goals.Where(g => g.Worker == worker).Select(a => a.Topic).ToList() ;
-            var modelTopics = MapTopicList(topics,workerTopic,goalTopic);
+            var goalTopic = _context.Goals.Where(g => g.Worker == worker).Select(a => a.Topic).ToList();
+            var modelTopics = MapTopicList(topics, workerTopic, goalTopic);
 
 
             if (!String.IsNullOrEmpty(searchString))
@@ -74,10 +76,10 @@ namespace EducationSystem.Controllers
             int pageSize = 5;
             int pageNumber = (page ?? 1);
 
-            return View(modelTopics.ToPagedList(pageNumber,pageSize));
+            return View(modelTopics.ToPagedList(pageNumber, pageSize));
         }
 
-        public List<TopicModel> MapTopicList(List<Topic> topics,List<Topic> workerTopics,List<Topic> goals)
+        public List<TopicModel> MapTopicList(List<Topic> topics, List<Topic> workerTopics, List<Topic> goals)
         {
             List<TopicModel> topicModelList = new List<TopicModel>();
             foreach (var topic in topics)
@@ -94,7 +96,7 @@ namespace EducationSystem.Controllers
                 if (goals.Contains(topic))
                 {
                     Console.WriteLine("hello");
-                    tempModel.GoalsLearned=true;
+                    tempModel.GoalsLearned = true;
                 }
                 else {
                     tempModel.GoalsLearned = false;
@@ -112,14 +114,14 @@ namespace EducationSystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Learn(int topicId,bool learned,string type,string place) {
+        public async Task<IActionResult> Learn(int topicId, bool learned, string type, string place) {
 
 
             var topic = _topicService.GetTopicById(topicId);
             var username = HttpContext.User.Identity.Name;
             var user = await _userManager.FindByNameAsync(username);
             var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
-            if (type=="learnUnlearn")
+            if (type == "learnUnlearn")
             {
                 if (!learned)
                 {
@@ -192,13 +194,13 @@ namespace EducationSystem.Controllers
         // GET: Topics/Create
         public IActionResult Create(int? id)
         {
-            TopicCreateViewModel tcm=new TopicCreateViewModel();
+            TopicCreateViewModel tcm = new TopicCreateViewModel();
             if (id == null)
             {
                 List<Topic> topiclist = _context.Topics.ToListAsync().Result;
                 topiclist.Insert(0, new Topic() { Id = -1, Name = "none" });
 
-                Topic parent= null;
+                Topic parent = null;
                 ViewBag.Parent = parent;
             }
             else {
@@ -207,7 +209,7 @@ namespace EducationSystem.Controllers
                 ViewBag.Parent = parent;
 
             }
-            
+
             return View(tcm);
         }
 
@@ -216,14 +218,14 @@ namespace EducationSystem.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( TopicCreateViewModel topic)
-        
+        public async Task<IActionResult> Create(TopicCreateViewModel topic)
+
         {
             Topic topicToCreate = new Topic() { Name = topic.Name, Description = topic.Description };
             int redirect = default(int);
             if (topic.ParentId != default(int)) {
                 redirect = topic.Id;
-                }
+            }
 
             if (topic.ParentId != default(int))
             {
@@ -240,7 +242,7 @@ namespace EducationSystem.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 else {
-                    return RedirectToAction(nameof(Details),new { id = redirect });
+                    return RedirectToAction(nameof(Details), new { id = redirect });
                 }
             }
 
@@ -299,8 +301,8 @@ namespace EducationSystem.Controllers
                         throw;
                     }
                 }
-                    return RedirectToAction(nameof(Details), new { id = id });
-                
+                return RedirectToAction(nameof(Details), new { id = id });
+
             }
 
             return View(topic);
@@ -323,11 +325,73 @@ namespace EducationSystem.Controllers
 
             return View(topic);
         }
-   
+
+        public ActionResult Tree(int? Id) {
+
+            if (Id == null) {
+                return NotFound();
+            }
+            Topic topic = _topicService.GetTopicById((int)Id);
+
+            return View(topic);
+        }
+
 
         private bool TopicExists(int id)
         {
             return _context.Topics.Any(e => e.Id == id);
+        }
+        [HttpGet]
+        public JsonResult AjaxMethod(int id)
+        {
+            Console.WriteLine(id);
+            Topic topic = _topicService.GetTopicById(id);
+
+            topic.SubTopics = getAllSubordinates(topic.Id);
+
+            List<Object> str = new List<object>();
+            str.Add(new object[] { "Topic tree" });
+            str.Add(new object[] { topic.Name});
+            foreach (var s in topic.SubTopics) {
+                str.Add(new object[] { topic.Name + " " + s.Name });
+            }
+            return Json(str);
+        }
+        public List<Topic> getAllSubordinates(int topicId)
+        {
+            var topic = _context.Topics.Include(t => t.SubTopics)
+                .FirstOrDefault(m => m.Id == topicId);
+
+            List<Topic> result = new List<Topic>();
+
+            foreach (var subtopics in topic.SubTopics)
+            {
+                result.Add(subtopics);
+                result.AddRange(getAllSubordinates(subtopics.Id));
+            }
+
+            return result;
+        }
+
+        public List<Object> getTopics(Topic topics,string name)
+        {
+            List<Object> objects = new List<Object>();
+            name += topics.Name;
+            foreach (var v in topics.SubTopics){
+                if (v.SubTopics != null)
+                {
+
+                }
+                else {
+                    string temp = name;
+                    temp += v.Name;
+                    objects.Add(new Object[] { temp });
+                }
+            }
+            objects.Add(new Object[] { name });
+
+
+        return objects;
         }
     }
 }

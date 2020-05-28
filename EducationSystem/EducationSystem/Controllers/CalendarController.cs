@@ -76,7 +76,7 @@ namespace EducationSystem.Controllers
             var jsonData = JsonSerializer.Serialize(restriction);
             return Json(jsonData);
         }
-
+        
         // Creates a ViewBag of Suggested Topics aka Goals
         public async Task GetSuggestedTopics()
         {

@@ -4,8 +4,7 @@
 }
 
 <h1>Tree</h1>
-<!DOCTYPE html>
-
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -13,48 +12,53 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
-        google.load("visualization", "1", { packages: ["corechart"] });
-        google.setOnLoadCallback(drawChart);
+        google.charts.load('current', { packages: ['wordtree'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+
         function drawChart() {
-            var data = google.visualization.arrayToDataTable(
-                [['Phrases'],
-                ['cats are better than dogs'],
-                ['cats eat kibble'],
-                ['cats are better than hamsters'],
-                ['cats are awesome'],
-                ['cats are people too'],
-                ['cats eat mice'],
-                ['cats meowing'],
-                ['cats in the cradle'],
-                ['cats eat mice'],
-                ['cats in the cradle lyrics'],
-                ['cats eat kibble'],
-                ['cats for adoption'],
-                ['cats are family'],
-                ['cats eat mice'],
-                ['cats are better than kittens'],
-                ['cats are evil'],
-                ['cats are weird'],
-                ['cats eat mice'],
-                ]
-            );
+
+            var topicId =@Html.Raw(Model.Id);
+            $.ajax({
+                type: "GET",
+                url: "/Topics/AjaxMethod",
+                data: { Id: topicId },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) {
 
 
-            var options = {
-                wordtree: {
-                    format: 'implicit',
-                    word: 'cats'
+                    console.log(JSON.stringify(r));
+
+                    var data = google.visualization.arrayToDataTable(r);
+
+                    var options = {
+                        wordtree: {
+                            format: 'implicit',
+                            word: @Html.Raw(Model.Id)
+                        }
+                    };
+
+                    var chart = new google.visualization.WordTree(document.getElementById('wordtree_basic'));
+                    chart.draw(data, options);
+
+
+
+
+                },
+                failure: function (r) {
+                    alert(r.d);
+                },
+                error: function (r) {
+                    alert(r.d);
                 }
-            };
+            });
 
-            var chart = new google.visualization.WordTree(document.getElementById('wordtree_basic'));
-            chart.draw(data, options);
 
         }
     </script>
 </head>
 <body>
-    <div id="wordtree_basic" style="width: 500px; height: 400px;">
-    </div>
+    <div id="wordtree_basic" style="width: 900px; height: 500px;"></div>
 </body>
 </html>
