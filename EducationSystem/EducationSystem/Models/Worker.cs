@@ -8,7 +8,7 @@ namespace EducationSystem.Models
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public Restriction Restriction { get; private set; }
+        public Restriction Restriction { get; set; }
         public Team TeamManager { get; set; }
         public virtual ICollection<Worker> Subordinates { get; set; }
         public virtual ICollection<WorkerTopic> WorkerTopics { get; set; }

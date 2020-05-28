@@ -3,44 +3,42 @@
 @{
     ViewData["Title"] = "Teams";
 }
-
-<hr />
-<dl class="row">
-    <dt class="col-sm-2">
-        @Html.DisplayNameFor(model => model.Name)
-    </dt>
-    <dd class="col-sm-10">
-        @Html.DisplayFor(model => model.Name)
-    </dd>
-    <dt class="col-sm-2">
-        @Html.DisplayNameFor(model => model.Description)
-    </dt>
-    <dd class="col-sm-10">
-        <span style="white-space:pre-line">@Html.DisplayFor(model => model.Description)</span>
-    </dd>
-</dl>
+<head>
+    <link href='~/css/EducationSystem.css' rel='stylesheet' />
+</head>
+<h4>
+    Teams that have studied "@Html.DisplayFor(model => model.Name)"
+</h4>
+@{
+    var vb = ViewBag.teamModel;
+    if (ViewBag.teamModel.Count > 0)
+    {
+        <hr />
+        <h6>A total of @ViewBag.teamModel.Count teams have studied this topic</h6>
+        @foreach (var a in ViewBag.teamModel)
+        {
+            <hr />
+            <h4>@a.team.TeamName</h4>
+            <h5>@a.workers.Count out of @a.teamSize members of this team have studied "@Html.DisplayFor(model => model.Name)"</h5>
+            <h5>Team members: </h5>
+            @foreach (var b in a.workers)
+            {
+                <dl class="row">
+                    <dd class="col-sm-10">
+                        @b.FirstName @b.LastName
+                    </dd>
+                </dl>
+            }
+        }
+    }
+}
 <div>
     @if (Model.Parent == null)
     {
-        <a asp-action="Index">Back</a>
+        <a class="edu-system-button btn btn-light" asp-action="Index">Back</a>
     }
     else
     {
-        <a asp-action="Details" asp-route-id="@Model.Parent.Id"> Back </a>
+        <a class="edu-system-button btn btn-light" asp-action="Details" asp-route-id="@Model.Parent.Id">Back</a>
     }
 </div>
-
-
-
-
-
-@foreach (var a in ViewBag.teamModel)
-{
-    <h3>@a.team.TeamName</h3>
-    <h4>Learned @a.workers.Count out of @a.teamSize</h4>
-    @foreach (var b in a.workers)
-    {
-        <p>@b.FirstName @b.LastName</p>
-    }
-}
-

@@ -67,6 +67,7 @@
                     <div class="table-item-buttons">
                         <a class="edu-system-button btn btn-light" asp-action="Edit" asp-route-id="@item.Id">Edit</a><div class="vertical-line" />
                         <a class="edu-system-button btn btn-light" asp-action="Details" asp-route-id="@item.Id">Details</a><div class="vertical-line" />
+                        <a class="edu-system-button btn btn-light" asp-action="Teams" asp-route-id="@item.Id">Teams which have studied this</a><div class="vertical-line" />
                         @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
                         {
                             @Html.Hidden("topicId", item.Id);
@@ -81,7 +82,7 @@
                             {
                                 <input class="edu-system-button btn btn-light" type="submit" value="Unlearn" />
                             }
-                        }<div class="vertical-line"/>
+                        }<div class="vertical-line" />
                         @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
                         {
                             @Html.Hidden("topicId", item.Id);
