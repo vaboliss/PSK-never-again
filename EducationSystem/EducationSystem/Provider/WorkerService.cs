@@ -187,7 +187,7 @@ namespace EducationSystem.Provider
         public List<Worker> GetAllSubordinates(int id, int topicId)
         {
             List<Worker> workerList = new List<Worker>();
-            var worker= _edu.Workers.Include(w=>w.TeamManager).Include(s=>s.Subordinates).Where(w => w.Id == id).FirstOrDefault();
+            var worker = _edu.Workers.Include(w => w.TeamManager).Include(s=>s.Subordinates).Where(w => w.Id == id).FirstOrDefault();
 
             if (worker.Subordinates != null)
             {
