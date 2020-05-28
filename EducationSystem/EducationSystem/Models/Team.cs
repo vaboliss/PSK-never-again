@@ -10,5 +10,7 @@ namespace EducationSystem.Models
         [Required]
         public int WorkerId { get; set; }
         public virtual Worker Manager { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }
