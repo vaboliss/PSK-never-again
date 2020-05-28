@@ -17,7 +17,7 @@ namespace EducationSystem.Provider
 
         public Team GetTeamByManagerId(int id)
         {
-            Team t= _edu.Teams.Include(m=>m.Manager).FirstOrDefault(t => t.WorkerId == id);
+            Team t = _edu.Teams.Include(m => m.Manager).FirstOrDefault(t => t.WorkerId == id);
             return t;
         }
 
