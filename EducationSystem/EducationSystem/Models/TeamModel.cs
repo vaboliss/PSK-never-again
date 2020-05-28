@@ -8,7 +8,7 @@ namespace EducationSystem.Models
     {
         public Team team;
         public Worker manager;
-        public List<Worker> workers=new List<Worker>();
+        public List<Worker> workers = new List<Worker>();
         public int teamSize;
     }
 }
