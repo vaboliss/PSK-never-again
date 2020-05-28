@@ -21,9 +21,5 @@ namespace EducationSystem.Provider
             return t;
         }
 
-        public int GetTeamSize()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }
