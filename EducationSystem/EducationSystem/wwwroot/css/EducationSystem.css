@@ -20,11 +20,47 @@
     right: 0px;
     max-height: 50px;
 }
-.btn, .btn-primary {
+.add-new-button, .page-item.active {
     color: #fff;
     background-color: #3788d8;
 }
-.btn:hover, .btn-primary:hover {
+.add-new-button:hover {
     color: #fff;
     background-color: #225587;
+}
+h2 {
+    margin-bottom: 2em;
+}
+.table-item-buttons {
+    display: flex;
+}
+.table-item-buttons a, .table-item-buttons input, .edu-system-button {
+    margin: 0 1em;
+}
+.table-item-buttons input:hover, .table-item-buttons a:hover, .edu-system-button:hover, .page-link:hover, .page-item.active:hover {
+    background-color: #3788d8;
+    color: white;
+}
+.page-item {
+    background: #f8f9fa;
+}
+.table-header {
+    display: flex;
+    margin: 1.5em 0em;
+    align-items: center;
+    justify-content: left;
+}
+.table-header > h5 {
+    margin-right: 1em;
+}
+.table-header > .search-field {
+    margin-left: auto;
+    margin-right: auto;
+}
+.table-header > .add-new-button {
+    align-items: center;
+    justify-content: left;
+}
+#SearchString {
+    min-width: 30em;
 }

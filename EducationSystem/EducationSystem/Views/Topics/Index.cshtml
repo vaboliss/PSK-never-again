@@ -14,13 +14,13 @@
 
 @using (Html.BeginForm())
 {
-<div class="topics-header">
-    @Html.Hidden("SortOrder", (object)ViewBag.NameSortParm)
-    @Html.Hidden("EmptySearch", 0)
-    Find topic by name @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
-    <input type="submit" value="Search" />
-    <div class="add-topic-button">
-        <a class="btn btn-primary" asp-action="Create">Add new topic</a>
+<div class="table-header">
+    <a class="add-new-button btn btn-primary" asp-action="Create">Add new topic</a>
+    <div class="search-field">
+        @Html.Hidden("SortOrder", (object)ViewBag.NameSortParm)
+        @Html.Hidden("EmptySearch", 0)
+        Find by name @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+        <input type="submit" value="Search" />
     </div>
 </div>
 }
@@ -64,39 +64,40 @@
                     @Truncate(item.Description)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Teams" asp-route-id="@item.Id">Teams which learned</a> |
-                    @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
-                    {
-                        @Html.Hidden("topicId", item.Id);
-                        @Html.Hidden("learned", item.Learned);
-                        @Html.Hidden("type", "learnUnlearn");
-                        @Html.Hidden("place", "index");
-                        @if (item.Learned == false)
+                    <div class="table-item-buttons">
+                        <a class="edu-system-button btn btn-light" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a class="edu-system-button btn btn-light" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
                         {
-                            <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Learn" />
+                            @Html.Hidden("topicId", item.Id);
+                            @Html.Hidden("learned", item.Learned);
+                            @Html.Hidden("type", "learnUnlearn");
+                            @Html.Hidden("place", "index");
+                            @if (item.Learned == false)
+                            {
+                                <input class="edu-system-button btn btn-light" type="submit" value="Learn" />
+                            }
+                            else
+                            {
+                                <input class="edu-system-button btn btn-light" type="submit" value="Unlearn" />
+                            }
                         }
-                        else
+                        @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
                         {
-                            <input style="color:#f00;border:0px #000 solid;background-color:#fff;" type="submit" value="Unlearn" />
+                            @Html.Hidden("topicId", item.Id);
+                            @Html.Hidden("learned", item.GoalsLearned);
+                            @Html.Hidden("type", "goal");
+                            @Html.Hidden("place", "index");
+                            @if (item.GoalsLearned == false)
+                            {
+                                <input class="edu-system-button btn btn-light" name="goal" type="submit" value="Set goal" />
+                            }
+                            else
+                            {
+                                <input class="edu-system-button btn btn-light" name="goal" type="submit" value="Unset goal" />
+                            }
                         }
-                    }
-                    @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
-                    {
-                        @Html.Hidden("topicId", item.Id);
-                        @Html.Hidden("learned", item.GoalsLearned);
-                        @Html.Hidden("type", "goal");
-                        @Html.Hidden("place", "index");
-                        @if (item.GoalsLearned == false)
-                        {
-                            <input style="color:#f00;border:0px #000 solid;background-color:#fff;" name="goal" type="submit" value="Set goal" />
-                        }
-                        else
-                        {
-                            <input style="color:#f00;border:0px #000 solid;background-color:#fff;" name="goal" type="submit" value="Unset goal" />
-                        }
-                    }
+                    </div>
 
                 </td>
             </tr>

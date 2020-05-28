@@ -6,14 +6,13 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
 @if (ViewBag.Parent != null)
 {
-    <h4>Create Subtopic</h4>
+    <h4>Add new subtopic</h4>
 }
 else
 {
-    <h4>Create Topic</h4>
+    <h4>Add new topic</h4>
 }
 <hr />
 <div class="row">
@@ -21,7 +20,7 @@ else
         <form asp-action="Create">
             @if (ViewBag.Parent != null)
             {
-                <h5>This subtopic has a parent @ViewBag.Parent.Name</h5>
+                <h5>This subtopic will be created under @ViewBag.Parent.Name</h5>
                 @Html.HiddenFor(x => x.ParentId,new { Value = @ViewBag.Parent.Id });
             }
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
