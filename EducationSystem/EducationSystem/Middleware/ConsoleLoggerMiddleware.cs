@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using EducationSystem.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 
 namespace EducationSystem.Middleware
 {
-    public class LoggingMiddleware
+    public class ConsoleLoggerMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public LoggingMiddleware(RequestDelegate next)
+        public ConsoleLoggerMiddleware(RequestDelegate next)
         {
             _next = next;
         }
@@ -26,10 +20,11 @@ namespace EducationSystem.Middleware
             {
                 Debug.WriteLine(
                     $" Username:  {context.User.Identity.Name} \n" +
-                    $" Role: "+ (context.User.IsInRole("Worker") ? "Worker" : (context.User.IsInRole("Manager") ? "Manager": "Anonymous")) +"\n" + 
+                    $" Role: " + (context.User.IsInRole("Worker") ? "Worker" : (context.User.IsInRole("Manager") ? "Manager" : "Anonymous")) + "\n" +
                     $" Request Type : {context.Request.Method}\n" +
                     $" Request Url : {context.Request.Path}\n" +
                     $" Request Date : {DateTime.Now}");
+
                 await _next(context);
 
             }
