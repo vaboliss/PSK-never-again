@@ -48,7 +48,7 @@ foreach (var item in topicsList)
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label class="control-label"></label>
-                    <select class="form-control" asp-items="ViewBag.TopicsToAssign" name="TopicId"></select>
+                    <select class="form-control w-25" asp-items="ViewBag.TopicsToAssign" name="TopicId"></select>
                 </div>
                 <div class="form-group">
                     <input class="add-new-button btn btn-light" asp-action="AssignGoal" asp-route-id="@Model.Id" type="submit" value="Assign goal" />
