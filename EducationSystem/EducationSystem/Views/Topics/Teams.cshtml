@@ -4,7 +4,6 @@
     ViewData["Title"] = "Teams";
 }
 
-<h1>c</h1>
 <hr />
 <dl class="row">
     <dt class="col-sm-2">
@@ -20,16 +19,28 @@
         <span style="white-space:pre-line">@Html.DisplayFor(model => model.Description)</span>
     </dd>
 </dl>
+<div>
+    @if (Model.Parent == null)
+    {
+        <a asp-action="Index">Back</a>
+    }
+    else
+    {
+        <a asp-action="Details" asp-route-id="@Model.Parent.Id"> Back </a>
+    }
+</div>
 
 
 
 
 
-                @foreach (var a in ViewBag.teamModel) {
-                <h3>@a.team.TeamName</h3>
-                <h4>Learned @a.workers.Count out of @a.teamSize</h4>
-                @foreach (var b in a.workers) {
-                <p>@b.FirstName @b.LastName</p>
-                }
-                }
+@foreach (var a in ViewBag.teamModel)
+{
+    <h3>@a.team.TeamName</h3>
+    <h4>Learned @a.workers.Count out of @a.teamSize</h4>
+    @foreach (var b in a.workers)
+    {
+        <p>@b.FirstName @b.LastName</p>
+    }
+}
 

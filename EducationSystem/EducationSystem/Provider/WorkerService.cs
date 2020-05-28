@@ -194,9 +194,8 @@ namespace EducationSystem.Provider
 
                 foreach (var w in worker.Subordinates)
                 {
-                    if (_edu.Goals.Where(wrk => wrk.TopicId == topicId && wrk.WorkerId==w.Id).FirstOrDefault() != null)
+                    if (_edu.WorkerTopics.Where(wrk => wrk.TopicId == topicId && wrk.WorkerId==w.Id).FirstOrDefault() != null)
                     {
-
                         workerList.Add(w);
                     }
                     if (_edu.Workers.Any(a => a.Subordinates!=null));

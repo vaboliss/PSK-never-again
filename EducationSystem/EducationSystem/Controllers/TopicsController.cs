@@ -356,18 +356,12 @@ namespace EducationSystem.Controllers
                     tempTeamModel.workers.Add(w);
                     topicModel.Add(tempTeamModel);
                 }
-
             }
-
-
             foreach (var t in topicModel)
             {
                 t.team = _context.Teams.Where(teams => teams.WorkerId == t.manager.Id).FirstOrDefault();
                 t.teamSize = _workerService.GetSubordinatesCount(t.manager.Id);
-
             }
-
-
                 return topicModel;
         }
 
