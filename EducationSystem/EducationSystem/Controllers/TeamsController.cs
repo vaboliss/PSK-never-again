@@ -348,7 +348,6 @@ namespace EducationSystem.Controllers
         {
 
             var worker = await _context.Workers.Include(i => i.Restriction)
-            .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Id == id);
 
             if (worker == null)
