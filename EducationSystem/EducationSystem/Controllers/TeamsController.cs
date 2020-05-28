@@ -395,6 +395,7 @@ namespace EducationSystem.Controllers
             return RedirectToAction(nameof(Index));
 
         }
+
         private bool TeamExists(int id)
         {
             return _context.Teams.Any(e => e.Id == id);

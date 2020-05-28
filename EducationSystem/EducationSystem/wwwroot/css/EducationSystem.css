@@ -64,3 +64,8 @@ h2 {
 #SearchString {
     min-width: 30em;
 }
+.vertical-line {
+    border-left: solid #000000 ;
+    border-width: 1px;
+    display: flex;
+}

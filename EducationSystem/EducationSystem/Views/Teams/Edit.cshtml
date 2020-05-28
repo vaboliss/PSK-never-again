@@ -3,10 +3,10 @@
 @{
     ViewData["Title"] = "Edit";
 }
-
-<h1>Edit</h1>
-
-<h4>Team</h4>
+<head>
+    <link href='~/css/EducationSystem.css' rel='stylesheet' />
+</head>
+<h4>Edit team @Html.DisplayFor(model => model.TeamName)</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -15,24 +15,25 @@
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="RowVersion" />
             <div class="form-group">
-                <label asp-for="TeamName" class="control-label"></label>
+                <label asp-for="TeamName" class="control-label">Team name</label>
                 <input asp-for="TeamName" class="form-control" />
                 <span asp-validation-for="TeamName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="WorkerId" class="control-label"></label>
+                <label asp-for="WorkerId" class="control-label">Manager ID</label>
                 <select asp-for="WorkerId" class="form-control" asp-items="ViewBag.WorkerId"></select>
                 <span asp-validation-for="WorkerId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="add-new-button btn btn-primary" />
+                <a class="edu-system-button btn btn-light" asp-action="Index">Back to list</a>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    
 </div>
 
 @section Scripts {

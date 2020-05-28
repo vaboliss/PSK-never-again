@@ -3,79 +3,88 @@
 @{
     ViewData["Title"] = "Details";
 }
-
-<h1>Details</h1>
-
+<head>
+    <link href='~/css/EducationSystem.css' rel='stylesheet' />
+</head>
 <div>
     <h4>Team</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TeamName)
+            Team name
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.TeamName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Manager)
+            Team manager
         </dt>
         <dd class="col-sm-2">
             @Html.DisplayFor(model => model.Manager.FirstName)
-        </dd>
-        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.Manager.LastName)
         </dd>
     </dl>
 </div>
 
 @{
-    <h5>Team members</h5>
+    <h4>Team members</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            First Name
+            First name
         </dt>
         <dt class="col-sm-10">
-            Last Name
+            Last name
         </dt>
     </dl>
     var workers = ViewBag.CurrentWorkers as ICollection<Worker>;
     foreach (var item in workers)
     {
-<form asp-action="DeleteWorker">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <dl class="row">
-
-        <dd class="col-sm-2">
-            @item.FirstName
-        </dd>
-        <dd class="col-sm-2">
-            @item.LastName
-        </dd>
-        <div class="form-group">
-            <input asp-action="DeleteWorker" asp-route-id="@item.Id" asp-route-managerId="@Model.Manager.Id" type="submit" value="Remove Worker" class="btn btn-primary" />
-        </div>
-        <div class="form-group">
-            <input asp-action="AddRestriction" asp-route-id="@item.Id" type="submit" value="Add Restriction" class="btn btn-primary" />
-        </div>
-    </dl>
-</form>
-
+        <form asp-action="DeleteWorker">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <dl class="row">
+                <dd class="col-sm-2">
+                    @item.FirstName
+                </dd>
+                <dd class="col-sm-2">
+                    @item.LastName
+                </dd>
+                <div class="form-group">
+                    <input class="edu-system-button btn btn-light" asp-action="DeleteWorker" asp-route-id="@item.Id" asp-route-managerId="@Model.Manager.Id" type="submit" value="Remove employee from team" />
+                </div>
+                <div class="form-group">
+                    <input class="edu-system-button btn btn-light" asp-action="AddRestriction" asp-route-id="@item.Id" type="submit" value="Add restriction" />
+                </div>
+            </dl>
+        </form>
+    }
 }
+@{
+    if (ViewBag.AvailableWorkers.Items.Count > 0)
+    {
+        <h6>Add new team member</h6>
+        <form asp-action="AssignWorker">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <select class="form-control" asp-items="ViewBag.AvailableWorkers" name="WorkerId"></select>
+            </div>
+            <input class="add-new-button btn btn-light" asp-action="AssignWorker" asp-route-id="@Model.Id" type="submit" value="Add employee to team" />
+            <a class="edu-system-button btn btn-light" asp-action="Edit" asp-route-id="@Model.Id">Edit team</a>
+            <a class="edu-system-button btn btn-light" asp-action="Index">Back to list</a>
+        </form>
+    }
+    else
+    {
+        <p>
+            <strong>
+                There are currently no available employees that can be added to this team
+            </strong>
+        </p>
+        <div>
+            <a class="edu-system-button btn btn-light" asp-action="Edit" asp-route-id="@Model.Id">Edit team</a>
+            <a class="edu-system-button btn btn-light" asp-action="Index">Back to list</a>
+        </div>
+    }
 }
 
-
-<form asp-action="AssingWorker">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group">
-        <label class="control-label"></label>
-        <select class="form-control" asp-items="ViewBag.AvailableWorkers" name="WorkerId"></select>
-    </div>
-    <div class="form-group">
-        <input asp-action="AssignWorker" asp-route-id="@Model.Id" type="submit" value="Assign worker" class="btn btn-primary" />
-    </div>
-</form>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
