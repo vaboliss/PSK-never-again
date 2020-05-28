@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace EducationSystem.Controllers
 {
-    [Authorize(Roles ="Worker")]
+    [Authorize(Roles ="Manager")]
     public class WorkersController : Controller
     {
         private readonly EducationSystemDbContext _context;

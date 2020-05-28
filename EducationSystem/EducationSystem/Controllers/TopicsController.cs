@@ -22,6 +22,7 @@ namespace EducationSystem.Controllers
         private readonly EducationSystemDbContext _context;
         private readonly ITopic _topicService;
         private readonly IWorker _workerService;
+       // private readonly ITeam _teamService;
         private readonly UserManager<ApplicationUser> _userManager;
         public TopicsController(EducationSystemDbContext context, ITopic topicService, IWorker workerService,UserManager<ApplicationUser> userManager)
         {
@@ -29,6 +30,7 @@ namespace EducationSystem.Controllers
             _topicService = topicService;
             _userManager = userManager;
             _workerService = workerService;
+          //  _teamService = teamService;
         }
 
         // GET: Topics
@@ -323,7 +325,51 @@ namespace EducationSystem.Controllers
 
             return View(topic);
         }
-   
+        public async Task<IActionResult> Teams(int? Id,int? teamId)
+        {
+            var topic = _topicService.GetTopicById((int)Id);
+            var username = HttpContext.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(username);
+            var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
+            var a = putIntoTeams(worker, (int)Id);
+            ViewBag.teamModel = a;
+            return View(topic);
+        
+        }
+        public List<TeamModel> putIntoTeams(Worker worker, int topicId)
+        {
+            List<TeamModel> topicModel = new List<TeamModel>();
+            List<Worker> workers = _workerService.GetAllSubordinates(worker.Id, topicId);
+            List<List<Worker>> sameTeam = new List<List<Worker>>();
+
+
+            foreach (var w in workers)
+            {
+                if (topicModel.Any(a => a.manager == w.Parent))
+                {
+                    topicModel.Where(a => a.manager == w.Parent).FirstOrDefault().workers.Add(w);
+                }
+                else
+                {
+                    var tempTeamModel = new TeamModel();
+                    tempTeamModel.manager = w.Parent;
+                    tempTeamModel.workers.Add(w);
+                    topicModel.Add(tempTeamModel);
+                }
+
+            }
+
+
+            foreach (var t in topicModel)
+            {
+                t.team = _context.Teams.Where(teams => teams.WorkerId == t.manager.Id).FirstOrDefault();
+                t.teamSize = _workerService.GetSubordinatesCount(t.manager.Id);
+
+            }
+
+
+                return topicModel;
+        }
 
         private bool TopicExists(int id)
         {

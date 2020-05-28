@@ -177,6 +177,37 @@ namespace EducationSystem.Provider
             }
             throw new Exception("Worker doesn't exist");
         }
+        public int GetSubordinatesCount(int workerId)
+        {
+            var worker = _edu.Workers.Include(s => s.Subordinates).Where(w => w.Id == workerId).FirstOrDefault();
+
+            return worker.Subordinates.Count;
+        
+        }
+        public List<Worker> GetAllSubordinates(int id, int topicId)
+        {
+            List<Worker> workerList = new List<Worker>();
+            var worker= _edu.Workers.Include(w=>w.TeamManager).Include(s=>s.Subordinates).Where(w => w.Id == id).FirstOrDefault();
+
+            if (worker.Subordinates != null)
+            {
+
+                foreach (var w in worker.Subordinates)
+                {
+                    if (_edu.Goals.Where(wrk => wrk.TopicId == topicId && wrk.WorkerId==w.Id).FirstOrDefault() != null)
+                    {
+
+                        workerList.Add(w);
+                    }
+                    if (_edu.Workers.Any(a => a.Subordinates!=null));
+                    {
+                        workerList.AddRange(GetAllSubordinates(w.Id, topicId));
+                    }
+                }
+            }
+
+            return workerList;
+        }
         public bool AssignWorkers(int managerId, int workerId)
         {
             //var manager = _edu.Workers.Find(managerId);
