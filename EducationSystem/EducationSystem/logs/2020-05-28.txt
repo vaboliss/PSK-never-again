@@ -1,0 +1,72 @@
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /
+ Request Date : 28-May-20 23:57:59
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /Calendar/GetWorkerRestrictions
+ Request Date : 28-May-20 23:58:03
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /Calendar/GetLearningDays
+ Request Date : 28-May-20 23:58:03
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /Calendar/GetLearningDays
+ Request Date : 28-May-20 23:58:05
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /Calendar/GetLearningDays
+ Request Date : 28-May-20 23:58:06
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /Calendar/GetLearningDays
+ Request Date : 28-May-20 23:58:06
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /Calendar/GetLearningDays
+ Request Date : 28-May-20 23:58:06
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : POST
+ Request Url : /Calendar/CreateLearningDayAndTopic
+ Request Date : 28-May-20 23:58:09
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /
+ Request Date : 28-May-20 23:58:09
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : POST
+ Request Url : /Calendar/CreateLearningDayAndTopic
+ Request Date : 28-May-20 23:58:09
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /Calendar/GetWorkerRestrictions
+ Request Date : 28-May-20 23:58:09
+
+ Username:  aaaa 
+ Role: Manager
+ Request Type : GET
+ Request Url : /Calendar/GetLearningDays
+ Request Date : 28-May-20 23:58:09
+

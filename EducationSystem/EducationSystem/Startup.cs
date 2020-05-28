@@ -87,7 +87,8 @@ namespace EducationSystem
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseMiddleware<LoggingMiddleware>();
+           // app.UseMiddleware<FileLoggerMiddleware>();
+            app.UseMiddleware<ConsoleLoggerMiddleware>();
             
             app.UseEndpoints(endpoints =>
             {
