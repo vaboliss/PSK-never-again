@@ -435,7 +435,7 @@ namespace EducationSystem.Controllers
             {
                 return NotFound();
             }
-            var goalCreated = _workerService.AssignGoal(worker, data.Id);
+            var goalCreated = _workerService.AssignGoal(worker, data.ParentId);
             if (goalCreated)
             {
                 return Json(data);
