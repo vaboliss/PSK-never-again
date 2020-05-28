@@ -69,3 +69,16 @@ h2 {
     border-width: 1px;
     display: flex;
 }
+#worker-topics {
+    display: none;
+}
+.delete-item {
+    width: 100%;
+}
+#view-topics-button {
+    margin: 0px;
+}
+.assign-goal-button {
+    display: none;
+    margin: 0px;
+}
