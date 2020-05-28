@@ -28,7 +28,8 @@ namespace EducationSystem.Middleware
                     $" Username:  {context.User.Identity.Name} \n" +
                     $" Role: "+ (context.User.IsInRole("Worker") ? "Worker" : (context.User.IsInRole("Manager") ? "Manager": "Anonymous")) +"\n" + 
                     $" Request Type : {context.Request.Method}\n" +
-                    $" Request Url : {context.Request.Path}\n");
+                    $" Request Url : {context.Request.Path}\n" +
+                    $" Request Date : {DateTime.Now}");
                 await _next(context);
 
             }
