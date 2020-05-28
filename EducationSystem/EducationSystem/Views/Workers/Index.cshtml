@@ -3,11 +3,12 @@
 @{
     ViewData["Title"] = "Index";
 }
-
+<head>
+    <link href='~/css/EducationSystem.css' rel='stylesheet' />
+</head>
 <h2>Employees</h2>
-
 <p>
-    <a asp-action="Create">Create new employee</a>
+    <a class="add-new-button btn btn-light" asp-action="Create">Create new employee</a>
 </p>
 <table class="table">
     <thead>
@@ -32,10 +33,12 @@
                     @Html.DisplayFor(modelItem => item.LastName)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
+                    <div class="table-item-buttons">
+                        <a class="edu-system-button btn btn-light" asp-action="Edit" asp-route-id="@item.Id">Edit</a><div class="vertical-line" />
+                        <a class="edu-system-button btn btn-light" asp-action="Details" asp-route-id="@item.Id">Details</a><div class="vertical-line" />
+                        <a class="edu-system-button btn btn-light" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </div>
+                    </td>
             </tr>
         }
     </tbody>
