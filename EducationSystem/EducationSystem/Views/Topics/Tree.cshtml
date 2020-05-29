@@ -19,6 +19,7 @@
         function drawChart() {
 
             var topicId =@Html.Raw(Model.Id);
+            var name = "@Model.Name";
             $.ajax({
                 type: "GET",
                 url: "/Topics/AjaxMethod",
@@ -35,7 +36,7 @@
                     var options = {
                         wordtree: {
                             format: 'implicit',
-                            word: @Html.Raw(Model.Id)
+                            word: name
                         }
                     };
 

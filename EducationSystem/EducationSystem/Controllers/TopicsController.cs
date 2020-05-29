@@ -326,7 +326,49 @@ namespace EducationSystem.Controllers
             return View(topic);
         }
 
-        public ActionResult Tree(int? Id) {
+        public async Task<IActionResult> Teams(int? Id,int? teamId)
+        {
+            var topic = _topicService.GetTopicById((int)Id);
+            var username = HttpContext.User.Identity.Name;
+            var user = await _userManager.FindByNameAsync(username);
+            var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
+            var a = putIntoTeams(worker, (int)Id);
+            ViewBag.teamModel = a;
+            return View(topic);
+        }
+
+        public List<TeamModel> putIntoTeams(Worker worker, int topicId)
+        {
+            List<TeamModel> topicModel = new List<TeamModel>();
+            List<Worker> workers = _workerService.GetAllSubordinates(worker.Id, topicId);
+            List<List<Worker>> sameTeam = new List<List<Worker>>();
+
+
+            foreach (var w in workers)
+            {
+                if (topicModel.Any(a => a.manager == w.Parent))
+                {
+                    topicModel.Where(a => a.manager == w.Parent).FirstOrDefault().workers.Add(w);
+                }
+                else
+                {
+                    var tempTeamModel = new TeamModel();
+                    tempTeamModel.manager = w.Parent;
+                    tempTeamModel.workers.Add(w);
+                    topicModel.Add(tempTeamModel);
+                }
+            }
+            foreach (var t in topicModel)
+            {
+                t.team = _context.Teams.Where(teams => teams.WorkerId == t.manager.Id).FirstOrDefault();
+                t.teamSize = _workerService.GetSubordinatesCount(t.manager.Id);
+            }
+                return topicModel;
+        }
+
+
+        public ActionResult Tree(int Id)
+        {
 
             if (Id == null) {
                 return NotFound();
@@ -344,30 +386,30 @@ namespace EducationSystem.Controllers
         [HttpGet]
         public JsonResult AjaxMethod(int id)
         {
-            Console.WriteLine(id);
             Topic topic = _topicService.GetTopicById(id);
 
             topic.SubTopics = getAllSubordinates(topic.Id);
-
+            Console.WriteLine(topic.SubTopics.Count);
             List<Object> str = new List<object>();
             str.Add(new object[] { "Topic tree" });
-            str.Add(new object[] { topic.Name});
-            foreach (var s in topic.SubTopics) {
-                str.Add(new object[] { topic.Name + " " + s.Name });
-            }
+
+            str.AddRange(getTopics(topic,topic.Name));
             return Json(str);
         }
         public List<Topic> getAllSubordinates(int topicId)
         {
             var topic = _context.Topics.Include(t => t.SubTopics)
                 .FirstOrDefault(m => m.Id == topicId);
-
+            topic.Name = topic.Name.Replace(" ", "_");
             List<Topic> result = new List<Topic>();
-
             foreach (var subtopics in topic.SubTopics)
             {
                 result.Add(subtopics);
-                result.AddRange(getAllSubordinates(subtopics.Id));
+                if (subtopics.SubTopics != null)
+                {
+                    result[result.Count-1].SubTopics=getAllSubordinates(subtopics.Id);
+                }
+                subtopics.Name = subtopics.Name.Replace(" ", " ");
             }
 
             return result;
@@ -375,20 +417,17 @@ namespace EducationSystem.Controllers
 
         public List<Object> getTopics(Topic topics,string name)
         {
+
             List<Object> objects = new List<Object>();
-            name += topics.Name;
+            objects.Add(new Object[] { name });
             foreach (var v in topics.SubTopics){
+                string temp = new String(name);
+                temp +=" "+v.Name;
                 if (v.SubTopics != null)
                 {
-
-                }
-                else {
-                    string temp = name;
-                    temp += v.Name;
-                    objects.Add(new Object[] { temp });
+                   objects.AddRange(getTopics(v, temp));
                 }
             }
-            objects.Add(new Object[] { name });
 
 
         return objects;

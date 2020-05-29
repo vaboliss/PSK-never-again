@@ -9,8 +9,12 @@ namespace EducationSystem.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Restriction Restriction { get; private set; }
+
+        public Team TeamManager { get; set; }
         public virtual ICollection<Worker> Subordinates { get; set; }
         public virtual ICollection<WorkerTopic> WorkerTopics { get; set; }
+        public virtual ICollection<Goal> WorkerGoals { get; set; }
+        public virtual Worker Parent { get; set; }
         public void SetMaxConsecutiveDays(int value)
         {
             if (value >= 0 && value <= GlobalRestrictions.MaxPerQuarter)
