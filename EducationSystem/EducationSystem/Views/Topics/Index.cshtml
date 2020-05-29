@@ -1,4 +1,6 @@
 ﻿@model IPagedList<EducationSystem.Models.TopicModel>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 
 @using X.PagedList.Mvc.Core;
 @using X.PagedList;
@@ -14,15 +16,15 @@
 
 @using (Html.BeginForm())
 {
-<div class="table-header">
-    <a class="add-new-button btn btn-primary" asp-action="Create">Add new topic</a>
-    <div class="search-field">
-        @Html.Hidden("SortOrder", (object)ViewBag.NameSortParm)
-        @Html.Hidden("EmptySearch", 0)
-        Find by name @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
-        <input type="submit" value="Search" />
+    <div class="table-header">
+        <a class="add-new-button btn btn-primary" asp-action="Create">Add new topic</a>
+        <div class="search-field">
+            @Html.Hidden("SortOrder", (object)ViewBag.NameSortParm)
+            @Html.Hidden("EmptySearch", 0)
+            Find by name @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+            <input type="submit" value="Search" />
+        </div>
     </div>
-</div>
 }
 <table class="table">
 
@@ -67,7 +69,12 @@
                     <div class="table-item-buttons">
                         <a class="edu-system-button btn btn-light" asp-action="Edit" asp-route-id="@item.Id">Edit</a><div class="vertical-line" />
                         <a class="edu-system-button btn btn-light" asp-action="Details" asp-route-id="@item.Id">Details</a><div class="vertical-line" />
-                        <a class="edu-system-button btn btn-light" asp-action="Teams" asp-route-id="@item.Id">Teams which have studied this</a><div class="vertical-line" />
+                        @{
+                            if (User.IsInRole("Manager"))
+                            {
+                                <a class="edu-system-button btn btn-light" asp-action="Teams" asp-route-id="@item.Id">Teams</a><div class="vertical-line" />
+                            }
+                        }
                         @using (Html.BeginForm("Learn", "Topics", FormMethod.Post))
                         {
                             @Html.Hidden("topicId", item.Id);
