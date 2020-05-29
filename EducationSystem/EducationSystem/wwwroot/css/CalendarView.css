@@ -2,6 +2,7 @@
      display: flex;
      margin-left: 0px;
      margin-right: 0px;
+     margin-top: 2em;
 }
  .instructions {
      color: #212529;
@@ -25,17 +26,16 @@
      border: 1px solid #ccc;
      background: rgba(255, 0, 0, 0.20);
 }
- #external-events{
-     position: relative;
-     top: 9%;
-     width: 200px;
-     min-height: 300px;
-     padding: 0 10px;
-     border: 1px solid #ccc;
-     background: #ededed;
-     color: #fff;
-     border-radius: 2px;
-     font-size: 14px;
+#external-events {
+    position: relative;
+    top: 8em;
+    width: 200px;
+    min-height: 300px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    background-image: linear-gradient(to bottom, rgba(195, 195, 195, 0.20), rgba(55, 136, 216, 0.00));
+    border-radius: 2px;
+    font-size: 14px;
 }
  #day-info {
      position: relative;
@@ -69,6 +69,7 @@
      border: 1px solid #ccc;
      background: #3788d8;
      overflow: hidden;
+     color: white;
 }
  .no-close .ui-dialog-titlebar-close {
      display: none;
@@ -76,13 +77,17 @@
  .fc-event-container {
      cursor: pointer;
 }
+.fc-event:hover {
+    background: #225587;
+    border-color: transparent;
+}
 .update-comments-button:hover {
-    background: #1e2b37;
+    background: #225587;
 }
 .update-comments-button {
     display: flex;
     float: left;
-    background: #2c3e50;
+    background: #3788d8;
     margin-left: 0;
     margin-right: auto;
 }
@@ -103,8 +108,33 @@
     width: 100%;
 }
 .subordinates-list {
-    margin-top: 4em;
-    background: rgba(55, 136, 216, 0.41);
+    top: 0px;
+    background-image: linear-gradient(to bottom, rgba(55, 136, 216, 0.35), rgba(55, 136, 216, 0.00));
     padding: 7px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
 }
- 
+.fc-toolbar.fc-header-toolbar {
+    margin-bottom: 0px;
+    padding: 1.5em;
+    background-image: linear-gradient(to bottom, rgba(55, 136, 216, 0.35), rgba(55, 136, 216, 0.00));
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    border-bottom: 0px;
+}
+.fc-button-primary {
+    color: #fff;
+    background-color: #3788d8;
+    border-color: transparent;
+}
+.fc-button-primary:hover {
+    color: #fff;
+    background-color: #225587;
+}
+.fc-button-primary:disabled {
+    color: #fff;
+    background-color: #527ba3;
+}
+.fc-button-primary:disabled:hover {
+    background-color: #32485e;
+}

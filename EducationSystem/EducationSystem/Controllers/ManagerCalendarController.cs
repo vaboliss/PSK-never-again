@@ -26,11 +26,14 @@ namespace EducationSystem.Controllers
 
         private ApplicationUser currentUser;
 
-        public ManagerCalendarController(EducationSystemDbContext context, UserManager<ApplicationUser> userManager, IWorker workerService)
+        private readonly ILearningDay _learningDayService;
+
+        public ManagerCalendarController(EducationSystemDbContext context, UserManager<ApplicationUser> userManager, IWorker workerService, ILearningDay learningDayService)
         {
             _context = context;
             _userManager = userManager;
             _workerService = workerService;
+            _learningDayService = learningDayService;
         }
         public async Task<IActionResult> Index()
         {
@@ -49,7 +52,7 @@ namespace EducationSystem.Controllers
         public async Task<List<Worker>> GetManagerSubordinates()
         {
             currentUser = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
-            return _workerService.GetCurrentWorkers(currentUser.WorkerId);
+            return _workerService.getAllSubordinates(currentUser.WorkerId);
         }
 
         // Creates a list of learning days for the calendar to display
@@ -132,6 +135,7 @@ namespace EducationSystem.Controllers
                 learningDay.Date = eventModel.Start;
                 _context.Add(learningDay);
                 _context.SaveChanges();
+                _learningDayService.SendMail(learningDay);
                 var jsonData = JsonSerializer.Serialize(eventModel);
                 return Json(jsonData);
             }
@@ -161,7 +165,7 @@ namespace EducationSystem.Controllers
                 learningDay.WorkerId = worker.Id;
                 learningDay.Date = eventModel.Start;
                 _context.Add(learningDay);
-
+                _learningDayService.SendMail(learningDay);
                 _context.SaveChanges();
                 return View(learningDay);
             }

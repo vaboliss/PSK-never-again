@@ -3,76 +3,164 @@
 @{
     ViewData["Title"] = "Details";
 }
-
-<h1>Details</h1>
-
+<head>
+    <link href='~/css/EducationSystem.css' rel='stylesheet' />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+            integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
+            crossorigin="anonymous"></script>
+</head>
 <div>
     <h4>Team</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TeamName)
+            Team name
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.TeamName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Manager)
+            Team manager
         </dt>
         <dd class="col-sm-2">
             @Html.DisplayFor(model => model.Manager.FirstName)
-        </dd>
-        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.Manager.LastName)
         </dd>
     </dl>
 </div>
 
 @{
-    <h5>Team members</h5>
+    <h4>Team members</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            First Name
+            First name
         </dt>
         <dt class="col-sm-10">
-            Last Name
+            Last name
         </dt>
     </dl>
     var workers = ViewBag.CurrentWorkers as ICollection<Worker>;
     foreach (var item in workers)
     {
-<form asp-action="DeleteWorker">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <dl class="row">
-
-        <dd class="col-sm-2">
-            @item.FirstName
-        </dd>
-        <dd class="col-sm-2">
-            @item.LastName
-        </dd>
-        <div class="form-group">
-            <input asp-action="DeleteWorker" asp-route-id="@item.Id" asp-route-managerId="@Model.Manager.Id" type="submit" value="Remove Worker" class="btn btn-primary" />
+    <div id="employee-info @item.Id" class="employee-info">
+        <form asp-action="DeleteWorker">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <dl class="row">
+                <dd class="col-sm-2">
+                    @item.FirstName
+                </dd>
+                <dd class="col-sm-2">
+                    @item.LastName
+                </dd>
+                <div class="form-group">
+                    <input class="edu-system-button btn btn-light" asp-action="DeleteWorker" asp-route-id="@item.Id" asp-route-managerId="@Model.Manager.Id" type="submit" value="Remove employee from team" />
+                </div>
+                <div class="form-group">
+                    <input class="edu-system-button btn btn-light" asp-action="AddRestriction" asp-route-id="@item.Id" type="submit" value="Add restriction" />
+                </div>
+            </dl>
+        </form>
+        <button id="view-topics-button" class="edu-system-button btn btn-light" onclick="createTopicsList(@item.Id)">View not yet learned topics</button>
+        <button id="assign-goal-button @item.Id" class="edu-system-button btn btn-light assign-goal-button" onclick="assignGoal(@item.Id)">Assign selected topic as goal</button>
+    </div>
+    <hr />
+    }
+}
+@{
+    if (ViewBag.AvailableWorkers.Items.Count > 0)
+    {
+        <h6>Add new team member</h6>
+        <form asp-action="AssignWorker">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <select class="form-control w-25" asp-items="ViewBag.AvailableWorkers" name="WorkerId"></select>
+            </div>
+            <input class="add-new-button btn btn-light" asp-action="AssignWorker" asp-route-id="@Model.Id" type="submit" value="Add employee to team" />
+            <a class="edu-system-button btn btn-light" asp-action="Edit" asp-route-id="@Model.Id">Edit team</a>
+            <a class="edu-system-button btn btn-light" asp-action="Index">Back to list</a>
+        </form>
+    }
+    else
+    {
+        <p>
+            <strong>
+                There are currently no available employees that can be added to this team
+            </strong>
+        </p>
+        <div>
+            <a class="edu-system-button btn btn-light" asp-action="Edit" asp-route-id="@Model.Id">Edit team</a>
+            <a class="edu-system-button btn btn-light" asp-action="Index">Back to list</a>
         </div>
-    </dl>
-</form>
-
+    }
 }
-}
-
-
-<form asp-action="AssingWorker">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group">
-        <label class="control-label"></label>
-        <select class="form-control" asp-items="ViewBag.AvailableWorkers" name="WorkerId"></select>
-    </div>
-    <div class="form-group">
-        <input asp-action="AssignWorker" asp-route-id="@Model.Id" type="submit" value="Assign worker" class="btn btn-primary" />
-    </div>
-</form>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div id="worker-topics">
+    <select id="worker-topics-list" class="form-control w-25"></select>
 </div>
+@{
+
+}
+<script>
+    function createTopicsList(workerId) {
+        var buttons = document.getElementsByClassName('assign-goal-button');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].style.display = 'none';
+        }
+        var selectedWorkerId = parseInt(workerId);
+        var data0 = { id: selectedWorkerId };
+        var json = JSON.stringify(data0);
+        $.ajax({
+            type: "GET",
+            url: '/Teams/GetWorkerTopics',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: data0,
+            success: function (data) {
+                displaySelectList(JSON.parse(data), workerId);
+                return;
+            }
+        });
+    }
+
+    function displaySelectList(data, workerId) {
+        var listContainer = document.getElementById("worker-topics");
+        var list = document.getElementById("worker-topics-list");
+        document.getElementById("assign-goal-button " + workerId).style.display = "block";
+        list.innerHTML = "";
+        document.getElementById("employee-info " + workerId).appendChild(listContainer);
+        data.forEach(function (item) {
+            var option = document.createElement("option");
+            option.value = item.Id;
+            option.text = item.Name;
+            list.appendChild(option);
+        });
+        listContainer.style.display = "block";
+    }
+
+    function assignGoal(workerId) {
+        var list = document.getElementById("worker-topics-list");
+        selectedTopicId = list.options[list.selectedIndex].value;
+        var data0 = { Id: workerId, ParentId: parseInt(selectedTopicId) };
+        var json = JSON.stringify(data0);
+        $.ajax({
+            type: "POST",
+            url: '/Teams/AssignGoalForWorker',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: json,
+            success: function () {
+                alert("Successfully created selected goal");
+                location.reload();
+                return;
+            },
+            failure: function () {
+                alert("There was an error processing this request");
+                return;
+            }
+        });
+    }
+</script>

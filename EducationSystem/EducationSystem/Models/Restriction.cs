@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using EducationSystem.Static;
+using System.Text.Json.Serialization;
 
 namespace EducationSystem.Models
 {
@@ -9,9 +10,17 @@ namespace EducationSystem.Models
         public int WorkerId { get; set; }
         [JsonIgnore]
         public Worker Worker { get; set; }
-        public int MaxConsecutiveDays { get; set; }
-        public int MaxPerMonth { get; set; }
-        public int MaxPerYear { get; set; }
-        public int MaxPerQuarter { get; set; }
+        public int? MaxConsecutiveDays { get; set; }
+        public int? MaxPerMonth { get; set; }
+        public int? MaxPerYear { get; set; }
+        public int? MaxPerQuarter { get; set; }
+
+        public Restriction()
+        {
+            MaxConsecutiveDays = GlobalRestrictions.MaxConsecutiveDays;
+            MaxPerMonth = GlobalRestrictions.MaxPerMonth;
+            MaxPerYear = GlobalRestrictions.MaxPerYear;
+            MaxPerQuarter = GlobalRestrictions.MaxPerQuarter;
+        }
     }
 }

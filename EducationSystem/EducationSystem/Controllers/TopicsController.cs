@@ -12,8 +12,6 @@ using X.PagedList;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace EducationSystem.Controllers
 {
@@ -25,7 +23,7 @@ namespace EducationSystem.Controllers
         private readonly ITopic _topicService;
         private readonly IWorker _workerService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public TopicsController(EducationSystemDbContext context, ITopic topicService, IWorker workerService, UserManager<ApplicationUser> userManager)
+        public TopicsController(EducationSystemDbContext context, ITopic topicService, IWorker workerService,UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _topicService = topicService;
@@ -52,11 +50,11 @@ namespace EducationSystem.Controllers
             ViewBag.CurrentFilter = searchString;
             var topics = await _topicService.GetAllTopics();
             var username = HttpContext.User.Identity.Name;
-            var user = await _userManager.FindByNameAsync(username);
+            var user =  await _userManager.FindByNameAsync(username);
             var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
             var workerTopic = _workerService.GetWorkersTopics(worker);
-            var goalTopic = _context.Goals.Where(g => g.Worker == worker).Select(a => a.Topic).ToList();
-            var modelTopics = MapTopicList(topics, workerTopic, goalTopic);
+            var goalTopic = _context.Goals.Where(g => g.Worker == worker).Select(a => a.Topic).ToList() ;
+            var modelTopics = MapTopicList(topics,workerTopic,goalTopic);
 
 
             if (!String.IsNullOrEmpty(searchString))
@@ -76,10 +74,10 @@ namespace EducationSystem.Controllers
             int pageSize = 5;
             int pageNumber = (page ?? 1);
 
-            return View(modelTopics.ToPagedList(pageNumber, pageSize));
+            return View(modelTopics.ToPagedList(pageNumber,pageSize));
         }
 
-        public List<TopicModel> MapTopicList(List<Topic> topics, List<Topic> workerTopics, List<Topic> goals)
+        public List<TopicModel> MapTopicList(List<Topic> topics,List<Topic> workerTopics,List<Topic> goals)
         {
             List<TopicModel> topicModelList = new List<TopicModel>();
             foreach (var topic in topics)
@@ -96,7 +94,7 @@ namespace EducationSystem.Controllers
                 if (goals.Contains(topic))
                 {
                     Console.WriteLine("hello");
-                    tempModel.GoalsLearned = true;
+                    tempModel.GoalsLearned=true;
                 }
                 else {
                     tempModel.GoalsLearned = false;
@@ -114,14 +112,14 @@ namespace EducationSystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Learn(int topicId, bool learned, string type, string place) {
+        public async Task<IActionResult> Learn(int topicId,bool learned,string type,string place) {
 
 
             var topic = _topicService.GetTopicById(topicId);
             var username = HttpContext.User.Identity.Name;
             var user = await _userManager.FindByNameAsync(username);
             var worker = await _context.Workers.FirstOrDefaultAsync(m => m.Id == user.WorkerId);
-            if (type == "learnUnlearn")
+            if (type=="learnUnlearn")
             {
                 if (!learned)
                 {
@@ -200,7 +198,7 @@ namespace EducationSystem.Controllers
                 List<Topic> topiclist = _context.Topics.ToListAsync().Result;
                 topiclist.Insert(0, new Topic() { Id = -1, Name = "none" });
 
-                Topic parent = null;
+                Topic parent= null;
                 ViewBag.Parent = parent;
             }
             else {
@@ -209,7 +207,7 @@ namespace EducationSystem.Controllers
                 ViewBag.Parent = parent;
 
             }
-
+            
             return View(tcm);
         }
 
@@ -219,13 +217,13 @@ namespace EducationSystem.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TopicCreateViewModel topic)
-
+        
         {
             Topic topicToCreate = new Topic() { Name = topic.Name, Description = topic.Description };
             int redirect = default(int);
             if (topic.ParentId != default(int)) {
                 redirect = topic.Id;
-            }
+                }
 
             if (topic.ParentId != default(int))
             {
@@ -242,7 +240,7 @@ namespace EducationSystem.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 else {
-                    return RedirectToAction(nameof(Details), new { id = redirect });
+                    return RedirectToAction(nameof(Details),new { id = redirect });
                 }
             }
 
@@ -301,8 +299,8 @@ namespace EducationSystem.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Details), new { id = id });
-
+                    return RedirectToAction(nameof(Details), new { id = id });
+                
             }
 
             return View(topic);

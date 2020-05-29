@@ -1,0 +1,42 @@
+﻿@model EducationSystem.Models.Worker
+
+@{
+    ViewData["Title"] = "Restriction";
+}
+<head>
+    <link href='~/css/EducationSystem.css' rel='stylesheet' />
+</head>
+<h4>Add self-study restrictions for @Html.DisplayFor(modelItem => modelItem.FirstName) @Html.DisplayFor(modelItem => modelItem.LastName)</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddRestrictionPost">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Restriction.MaxConsecutiveDays" class="control-label">Max consecutive days</label>
+                <input asp-for="Restriction.MaxConsecutiveDays" class="form-control" />
+                <span asp-validation-for="Restriction.MaxConsecutiveDays" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Restriction.MaxPerMonth" class="control-label">Max days per month</label>
+                <input asp-for="Restriction.MaxPerMonth" class="form-control" />
+                <span asp-validation-for="Restriction.MaxPerMonth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Restriction.MaxPerQuarter" class="control-label">Max days per quarter</label>
+                <input asp-for="Restriction.MaxPerQuarter" class="form-control" />
+                <span asp-validation-for="Restriction.MaxPerQuarter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Restriction.MaxPerYear" class="control-label">Max days per year</label>
+                <input asp-for="Restriction.MaxPerYear" class="form-control" />
+                <span asp-validation-for="Restriction.MaxPerYear" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input class="edu-system-button btn btn-light" type="submit" value="Add restrictions" />
+            </div>
+        </form>
+    </div>
+</div>
+

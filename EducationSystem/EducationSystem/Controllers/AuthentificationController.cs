@@ -1,29 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using EducationSystem.Models;
 using Microsoft.AspNetCore.Identity;
 using EducationSystem.Interfaces;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace EducationSystem.Controllers
 {
     public class Authentification : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private IWorker _workerServices;
         private RoleManager<IdentityRole> _roleManager;
         private SignInManager<ApplicationUser> _signInManager;
-        public Authentification(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, 
+        public Authentification(UserManager<ApplicationUser> userManager, 
             SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager
             ,IWorker workerServices)
         {
-            _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
             _workerServices = workerServices;
@@ -38,7 +32,7 @@ namespace EducationSystem.Controllers
         {
             await _signInManager.SignOutAsync();
 
-            return RedirectToAction("Index","Home");
+            return RedirectToAction("Index","Calendar");
         }
 
         [HttpPost]
@@ -86,7 +80,7 @@ namespace EducationSystem.Controllers
                 var AddedRole = await _userManager.AddToRoleAsync(user, "Worker");
                 if (AddedRole.Succeeded)
                 {
-                     return RedirectToAction("Index", "Home");
+                     return RedirectToAction("Index", "Calendar");
                 }
             }
             //failed to register

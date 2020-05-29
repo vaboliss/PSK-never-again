@@ -3,20 +3,22 @@
 @{
     ViewData["Title"] = "Index";
 }
-
-<h1>Index</h1>
+<head>
+    <link href='~/css/EducationSystem.css' rel='stylesheet' />
+</head>
+<h2>Teams</h2>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="add-new-button btn btn-primary" asp-action="Create">Create new team</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.TeamName)
+                Team name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Manager)
+                Assigned team manager
             </th>
             <th></th>
         </tr>
@@ -29,15 +31,17 @@
                     @Html.DisplayFor(modelItem => item.TeamName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Manager.FirstName)
+                    <p>
+                        @Html.DisplayFor(modelItem => item.Manager.FirstName) 
+                        @Html.DisplayFor(modelItem => item.Manager.LastName)
+                    </p>
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Manager.LastName)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <div class="table-item-buttons">
+                        <a class="edu-system-button btn btn-light" asp-action="Edit" asp-route-id="@item.Id">Edit</a><div class="vertical-line" />
+                        <a class="edu-system-button btn btn-light" asp-action="Details" asp-route-id="@item.Id">Details</a><div class="vertical-line" />
+                        <a class="edu-system-button btn btn-light" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </div>
                 </td>
             </tr>
         }

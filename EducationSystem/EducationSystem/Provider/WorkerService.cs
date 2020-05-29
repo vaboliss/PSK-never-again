@@ -187,18 +187,18 @@ namespace EducationSystem.Provider
         public List<Worker> GetAllSubordinates(int id, int topicId)
         {
             List<Worker> workerList = new List<Worker>();
-            var worker= _edu.Workers.Include(w=>w.TeamManager).Include(s=>s.Subordinates).Where(w => w.Id == id).FirstOrDefault();
+            var worker = _edu.Workers.Include(w => w.TeamManager).Include(s=>s.Subordinates).Where(w => w.Id == id).FirstOrDefault();
 
             if (worker.Subordinates != null)
             {
 
                 foreach (var w in worker.Subordinates)
                 {
-                    if (_edu.WorkerTopics.Where(wrk => wrk.TopicId == topicId && wrk.WorkerId==w.Id).FirstOrDefault() != null)
+                    if (_edu.WorkerTopics.Where(wrk => wrk.TopicId == topicId && wrk.WorkerId == w.Id).FirstOrDefault() != null)
                     {
                         workerList.Add(w);
                     }
-                    if (_edu.Workers.Any(a => a.Subordinates!=null));
+                    if (_edu.Workers.Any(a => a.Subordinates != null))
                     {
                         workerList.AddRange(GetAllSubordinates(w.Id, topicId));
                     }

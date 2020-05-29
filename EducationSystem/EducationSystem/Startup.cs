@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using EducationSystem.Middleware;
 
 namespace EducationSystem
 {
@@ -83,15 +84,17 @@ namespace EducationSystem
             app.UseStaticFiles();
 
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
 
+           // app.UseMiddleware<FileLoggerMiddleware>();
+            app.UseMiddleware<ConsoleLoggerMiddleware>();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Calendar}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
 
             });
