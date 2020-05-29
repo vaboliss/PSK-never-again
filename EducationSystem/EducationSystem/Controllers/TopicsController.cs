@@ -384,14 +384,14 @@ namespace EducationSystem.Controllers
         {
             Topic topic = _topicService.GetTopicById(id);
 
-            topic.SubTopics = getAllSubordinates(topic.Id);
+            topic.SubTopics = getLinkedTopics(topic.Id);
             List<Object> str = new List<object>();
             str.Add(new object[] { "Topic tree" });
 
             str.AddRange(getTopics(topic,topic.Name));
             return Json(str);
         }
-        public List<Topic> getAllSubordinates(int topicId)
+        public List<Topic> getLinkedTopics(int topicId)
         {
             var topic = _context.Topics.Include(t => t.SubTopics)
                 .FirstOrDefault(m => m.Id == topicId);
@@ -402,7 +402,7 @@ namespace EducationSystem.Controllers
                 result.Add(subtopics);
                 if (subtopics.SubTopics != null)
                 {
-                    result[result.Count-1].SubTopics=getAllSubordinates(subtopics.Id);
+                    result[result.Count-1].SubTopics= getLinkedTopics(subtopics.Id);
                 }
                 subtopics.Name = subtopics.Name.Replace(" ", " ");
             }
