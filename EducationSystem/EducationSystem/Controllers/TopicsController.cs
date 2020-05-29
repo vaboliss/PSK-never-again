@@ -32,7 +32,7 @@ namespace EducationSystem.Controllers
         }
 
         // GET: Topics
-        public async Task<IActionResult> Index(string sortOrder,int? emptySearch,string searchString, string currentFilter, int? page)
+        public async Task<IActionResult> Index(string sortOrder, int? emptySearch, string searchString, string currentFilter, int? page)
         {
 
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -93,7 +93,6 @@ namespace EducationSystem.Controllers
                 }
                 if (goals.Contains(topic))
                 {
-                    Console.WriteLine("hello");
                     tempModel.GoalsLearned=true;
                 }
                 else {
@@ -163,7 +162,6 @@ namespace EducationSystem.Controllers
         public async Task<IActionResult> Details(int? id)
         {
 
-            Console.WriteLine(id);
             if (id == null)
             {
                 return NotFound();
@@ -366,9 +364,70 @@ namespace EducationSystem.Controllers
                 return topicModel;
         }
 
+
+        public ActionResult Tree(int Id)
+        {
+
+            if (Id == null) {
+                return NotFound();
+            }
+            Topic topic = _topicService.GetTopicById((int)Id);
+
+            return View(topic);
+        }
+
+
         private bool TopicExists(int id)
         {
             return _context.Topics.Any(e => e.Id == id);
+        }
+        [HttpGet]
+        public JsonResult AjaxMethod(int id)
+        {
+            Topic topic = _topicService.GetTopicById(id);
+
+            topic.SubTopics = getLinkedTopics(topic.Id);
+            List<Object> str = new List<object>();
+            str.Add(new object[] { "Topic tree" });
+
+            str.AddRange(getTopics(topic,topic.Name));
+            return Json(str);
+        }
+        public List<Topic> getLinkedTopics(int topicId)
+        {
+            var topic = _context.Topics.Include(t => t.SubTopics)
+                .FirstOrDefault(m => m.Id == topicId);
+            topic.Name = topic.Name.Replace(" ", "_");
+            List<Topic> result = new List<Topic>();
+            foreach (var subtopics in topic.SubTopics)
+            {
+                result.Add(subtopics);
+                if (subtopics.SubTopics != null)
+                {
+                    result[result.Count-1].SubTopics= getLinkedTopics(subtopics.Id);
+                }
+                subtopics.Name = subtopics.Name.Replace(" ", " ");
+            }
+
+            return result;
+        }
+
+        public List<Object> getTopics(Topic topics,string name)
+        {
+
+            List<Object> objects = new List<Object>();
+            objects.Add(new Object[] { name });
+            foreach (var v in topics.SubTopics){
+                string temp = new String(name);
+                temp +=" "+v.Name;
+                if (v.SubTopics != null)
+                {
+                   objects.AddRange(getTopics(v, temp));
+                }
+            }
+
+
+        return objects;
         }
     }
 }
