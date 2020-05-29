@@ -82,3 +82,6 @@ h2 {
     display: none;
     margin: 0px;
 }
+.navbar-brand {
+    font-weight: 500;
+}
