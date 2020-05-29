@@ -124,6 +124,8 @@ namespace EducationSystem.Controllers
                 if (!learned)
                 {
                     _workerService.AssingLearned(worker, topic);
+                    _context.Goals.RemoveRange(_context.Goals.Where(g => g.TopicId == topic.Id && g.WorkerId == worker.Id));
+                    _context.SaveChanges();
                 }
                 else
                 {
