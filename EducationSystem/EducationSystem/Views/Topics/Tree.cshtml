@@ -31,9 +31,6 @@
                 dataType: "json",
                 success: function (r) {
 
-
-                    console.log(JSON.stringify(r));
-
                     var data = google.visualization.arrayToDataTable(r);
 
                     var options = {
@@ -45,9 +42,6 @@
 
                     var chart = new google.visualization.WordTree(document.getElementById('wordtree_basic'));
                     chart.draw(data, options);
-
-
-
 
                 },
                 failure: function (r) {

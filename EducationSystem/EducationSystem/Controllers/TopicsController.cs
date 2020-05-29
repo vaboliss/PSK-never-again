@@ -93,7 +93,6 @@ namespace EducationSystem.Controllers
                 }
                 if (goals.Contains(topic))
                 {
-                    Console.WriteLine("hello");
                     tempModel.GoalsLearned=true;
                 }
                 else {
@@ -161,7 +160,6 @@ namespace EducationSystem.Controllers
         public async Task<IActionResult> Details(int? id)
         {
 
-            Console.WriteLine(id);
             if (id == null)
             {
                 return NotFound();
@@ -387,7 +385,6 @@ namespace EducationSystem.Controllers
             Topic topic = _topicService.GetTopicById(id);
 
             topic.SubTopics = getAllSubordinates(topic.Id);
-            Console.WriteLine(topic.SubTopics.Count);
             List<Object> str = new List<object>();
             str.Add(new object[] { "Topic tree" });
 
